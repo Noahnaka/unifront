@@ -1,0 +1,202 @@
+
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
+
+const Register = () => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
+    terms: false,
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Register attempt:', formData);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 pt-16 pb-8">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-gradient mb-2">Crie sua conta</h1>
+          <p className="text-gray-400">Junte-se à comunidade de apostadores</p>
+        </div>
+
+        {/* Register Form */}
+        <div className="glass-card p-8 space-y-6 animated-border">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name Field */}
+            <div className="space-y-2">
+              <label htmlFor="name" className="text-sm font-medium text-gray-300">
+                Nome completo
+              </label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300"
+                  placeholder="Seu nome completo"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Email Field */}
+            <div className="space-y-2">
+              <label htmlFor="email" className="text-sm font-medium text-gray-300">
+                Email
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300"
+                  placeholder="seu@email.com"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Phone Field */}
+            <div className="space-y-2">
+              <label htmlFor="phone" className="text-sm font-medium text-gray-300">
+                Telefone
+              </label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300"
+                  placeholder="(11) 99999-9999"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Password Field */}
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium text-gray-300">
+                Senha
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-12 py-3 bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300"
+                  placeholder="Mínimo 8 caracteres"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors duration-300"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Confirm Password Field */}
+            <div className="space-y-2">
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-300">
+                Confirmar senha
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-12 py-3 bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400 transition-all duration-300"
+                  placeholder="Confirme sua senha"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-300 transition-colors duration-300"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Terms & Conditions */}
+            <div className="flex items-start space-x-2">
+              <input
+                id="terms"
+                name="terms"
+                type="checkbox"
+                checked={formData.terms}
+                onChange={handleChange}
+                className="mt-1 rounded bg-gray-800 border-gray-600 text-red-600 focus:ring-red-500 focus:ring-offset-0"
+                required
+              />
+              <label htmlFor="terms" className="text-sm text-gray-400">
+                Eu aceito os{' '}
+                <Link to="/terms" className="text-red-400 hover:text-red-300 transition-colors duration-300">
+                  Termos de Uso
+                </Link>{' '}
+                e a{' '}
+                <Link to="/privacy" className="text-red-400 hover:text-red-300 transition-colors duration-300">
+                  Política de Privacidade
+                </Link>
+              </label>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 font-medium neon-glow hover:shadow-lg transform hover:scale-105 pulse-red"
+            >
+              Criar conta
+            </button>
+          </form>
+
+          {/* Sign In Link */}
+          <p className="text-center text-gray-400">
+            Já tem uma conta?{' '}
+            <Link to="/login" className="text-red-400 hover:text-red-300 transition-colors duration-300 font-medium">
+              Entrar
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Register;
