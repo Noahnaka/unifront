@@ -1,9 +1,19 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Trophy, Target, TrendingUp, Users, Star } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 
 const Home = () => {
+  const { data: eventsData, isLoading } = useQuery({
+    queryKey: ['events'],
+    queryFn: async () => {
+      const response = await fetch('http://localhost:3000/api/ufc/eventos');
+      const data = await response.json();
+      console.log('Events data:', data);
+      return data;
+    }
+  });
+
   const stats = [
     { label: 'Vitórias', value: '22', color: 'text-green-400' },
     { label: 'Nocautes', value: '15', color: 'text-red-400' },
@@ -11,26 +21,21 @@ const Home = () => {
     { label: 'Apostas Hoje', value: '1.2M', color: 'text-yellow-400' },
   ];
 
-  const featuredEvents = [
-    {
-      id: 1,
-      title: 'UFC 300',
-      date: '24 de Abril',
-      location: 'Univap',
-      fighters: ['Jon Jones', 'Stipe Miocic'],
-      odds: { fighter1: 1.85, fighter2: 2.10 },
-      image: '/lovable-uploads/ef213dba-e1b7-4b1c-a649-99c8e1860342.png'
-    },
-    {
-      id: 2,
-      title: 'Bellator Championship',
-      date: '1 de Maio',
-      location: 'São Paulo',
-      fighters: ['Patricio Freire', 'Adam Borics'],
-      odds: { fighter1: 1.65, fighter2: 2.35 },
-      image: '/lovable-uploads/ef213dba-e1b7-4b1c-a649-99c8e1860342.png'
-    },
-  ];
+  const featuredEvents = eventsData?.data?.map(event => {
+    const fights = JSON.parse(event.lutas_evento);
+    const mainEvent = fights[0]; // First fight is usually the main event
+    
+    return {
+      id: event.id_evento,
+      title: event.nome_evento,
+      date: new Date(event.created_at).toLocaleDateString('pt-BR'),
+      location: event.local_evento,
+      fighters: [mainEvent.redFighter, mainEvent.blueFighter],
+      odds: { fighter1: 1.85, fighter2: 2.10 }, // These would come from a separate API
+      image: '/lovable-uploads/ef213dba-e1b7-4b1c-a649-99c8e1860342.png',
+      weightClass: mainEvent.weightClass
+    };
+  }) || [];
 
   return (
     <div className="min-h-screen pt-16">
@@ -78,9 +83,6 @@ const Home = () => {
             </div>
           </div>
         </div>
-
-        {/* Boxing Image */}
-       
       </section>
 
       {/* Featured Events */}
@@ -91,44 +93,62 @@ const Home = () => {
             <p className="text-gray-400 text-lg">Não perca as melhores lutas e oportunidades de apostas</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {featuredEvents.map((event) => (
-              <div key={event.id} className="glass-card p-6 hover-lift animated-border">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-2xl font-bold text-white mb-2">{event.title}</h3>
-                    <div className="flex items-center space-x-4 text-gray-400">
-                      <span className="flex items-center space-x-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{event.date}</span>
-                      </span>
-                      <span>{event.location}</span>
+          <div className={`grid gap-8 ${
+            featuredEvents.length === 1 
+              ? 'max-w-2xl mx-auto' 
+              : 'md:grid-cols-2'
+          }`}>
+            {isLoading ? (
+              <div className="text-center col-span-2">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
+                <p className="text-gray-400 mt-4">Carregando eventos...</p>
+              </div>
+            ) : (
+              featuredEvents.map((event) => (
+                <div key={event.id} className="glass-card p-6 hover-lift animated-border">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h4 className="text-xl font-semibold text-white mb-2">{event.title}</h4>
+                      <div className="flex items-center space-x-4 text-gray-400">
+                        <span className="flex items-center space-x-1">
+                          <Calendar className="w-4 h-4" />
+                          <span>{event.date}</span>
+                        </span>
+                        <span>{event.location}</span>
+                      </div>
+                    </div>
+                    <div className="bg-red-500/20 border border-red-500/50 text-red-400 px-3 py-1 rounded-full text-sm font-medium">
+                      Main Event
                     </div>
                   </div>
-                  <div className="text-yellow-400 text-lg font-bold">
-                    UFC 300
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-white">{event.fighters[0]}</div>
-                    <div className="text-red-400 text-xl font-bold">{event.odds.fighter1}</div>
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-white">{event.fighters[0]}</div>
+                      <div className="text-gray-400 text-sm mt-1">Red Corner</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-white">{event.fighters[1]}</div>
+                      <div className="text-gray-400 text-sm mt-1">Blue Corner</div>
+                    </div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-white">{event.fighters[1]}</div>
-                    <div className="text-red-400 text-xl font-bold">{event.odds.fighter2}</div>
-                  </div>
-                </div>
 
-                <Link
-                  to={`/events/${event.id}`}
-                  className="block w-full py-3 bg-red-600 text-white text-center rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
-                >
-                  Ver Detalhes
-                </Link>
-              </div>
-            ))}
+                  <div className="bg-gray-800/30 rounded-lg p-3 mb-6">
+                    <div className="text-center">
+                      <div className="text-gray-400 text-sm">Weight Class</div>
+                      <div className="text-white font-semibold mt-1">{event.weightClass || 'N/A'}</div>
+                    </div>
+                  </div>
+
+                  <Link
+                    to={`/events/${event.id}`}
+                    className="block w-full py-3 bg-red-600 text-white text-center rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
+                  >
+                    Ver Detalhes
+                  </Link>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>
