@@ -11,7 +11,6 @@ const Navbar = () => {
     { name: 'Home', path: '/', icon: Trophy },
     { name: 'Eventos', path: '/events', icon: Calendar },
     { name: 'Lutas', path: '/fights', icon: Target },
-    { name: 'Apostas', path: '/betting', icon: Users },
     { name: 'Ranking', path: '/leaderboard', icon: Trophy },
   ];
 
