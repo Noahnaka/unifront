@@ -9,7 +9,6 @@ const Navbar = () => {
 
   const navItems = [
     { name: 'Home', path: '/', icon: Trophy },
-    { name: 'Eventos', path: '/events', icon: Calendar },
     { name: 'Lutas', path: '/fights', icon: Target },
     { name: 'Ranking', path: '/leaderboard', icon: Trophy },
   ];

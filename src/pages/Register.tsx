@@ -1,9 +1,11 @@
-
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, Phone } from 'lucide-react';
 
 const Register = () => {
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -15,9 +17,44 @@ const Register = () => {
     terms: false,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Register attempt:', formData);
+    setError('');
+    setIsLoading(true);
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('As senhas não coincidem');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/api/cliente/cadastro', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nome_cliente: formData.name,
+          email_cliente: formData.email,
+          celular_cliente: formData.phone,
+          senha_cliente: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Erro ao criar conta');
+      }
+      localStorage.setItem('token', data.token);
+      
+      navigate('/');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao criar conta');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -154,35 +191,20 @@ const Register = () => {
               </div>
             </div>
 
-            {/* Terms & Conditions */}
-            <div className="flex items-start space-x-2">
-              <input
-                id="terms"
-                name="terms"
-                type="checkbox"
-                checked={formData.terms}
-                onChange={handleChange}
-                className="mt-1 rounded bg-gray-800 border-gray-600 text-red-600 focus:ring-red-500 focus:ring-offset-0"
-                required
-              />
-              <label htmlFor="terms" className="text-sm text-gray-400">
-                Eu aceito os{' '}
-                <Link to="/terms" className="text-red-400 hover:text-red-300 transition-colors duration-300">
-                  Termos de Uso
-                </Link>{' '}
-                e a{' '}
-                <Link to="/privacy" className="text-red-400 hover:text-red-300 transition-colors duration-300">
-                  Política de Privacidade
-                </Link>
-              </label>
-            </div>
+            {/* Error Message */}
+            {error && (
+              <div className="text-red-400 text-sm text-center">
+                {error}
+              </div>
+            )}
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 font-medium neon-glow hover:shadow-lg transform hover:scale-105 pulse-red"
+              disabled={isLoading}
+              className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-300 font-medium neon-glow hover:shadow-lg transform hover:scale-105 pulse-red disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Criar conta
+              {isLoading ? 'Criando conta...' : 'Criar conta'}
             </button>
           </form>
 

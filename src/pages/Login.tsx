@@ -142,20 +142,6 @@ const Login = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <button 
-                className="flex justify-center items-center px-4 py-2 border border-gray-600 rounded-lg hover:border-gray-500 transition-colors duration-300 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isLoading}
-              >
-                <span>Google</span>
-              </button>
-              <button 
-                className="flex justify-center items-center px-4 py-2 border border-gray-600 rounded-lg hover:border-gray-500 transition-colors duration-300 text-gray-300 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isLoading}
-              >
-                <span>Facebook</span>
-              </button>
-            </div>
           </div>
 
           {/* Sign Up Link */}

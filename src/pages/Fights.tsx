@@ -49,7 +49,6 @@ const Fights = () => {
 
   const tabs = [
     { id: 'upcoming', label: 'Próximas', icon: Calendar },
-    { id: 'finished', label: 'Finalizadas', icon: Trophy }
   ];
 
   return (
@@ -195,7 +194,7 @@ const Fights = () => {
                     </div>
 
                     {/* Actions */}
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="flex justify-center w-full">
                       <button 
                         onClick={() => navigate('/aposta', { 
                           state: { 
@@ -212,12 +211,9 @@ const Fights = () => {
                             }
                           }
                         })}
-                        className="py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
+                        className="w-full max-w-xl py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
                       >
                         Apostar Agora
-                      </button>
-                      <button className="py-3 border border-gray-600 text-gray-300 rounded-lg hover:border-red-500 hover:text-red-400 transition-all duration-300 font-medium">
-                        Ver Estatísticas
                       </button>
                     </div>
                   </div>

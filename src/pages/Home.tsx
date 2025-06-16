@@ -4,7 +4,9 @@ import { Calendar, Trophy, Target, TrendingUp, Users, Star } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query';
 
 const Home = () => {
-  const { data: eventsData, isLoading } = useQuery({
+  const token = localStorage.getItem('token');
+
+  const { data: eventsData, isLoading: isLoadingEvents } = useQuery({
     queryKey: ['events'],
     queryFn: async () => {
       const response = await fetch('http://localhost:3000/api/ufc/eventos');
@@ -14,11 +16,26 @@ const Home = () => {
     }
   });
 
+  const { data: statsData, isLoading: isLoadingStats } = useQuery({
+    queryKey: ['stats'],
+    queryFn: async () => {
+      const response = await fetch('http://localhost:3000/api/ufc/payload');
+      const data = await response.json();
+      return data;
+    }
+  });
+
   const stats = [
-    { label: 'Vitórias', value: '22', color: 'text-green-400' },
-    { label: 'Nocautes', value: '15', color: 'text-red-400' },
-    { label: 'Usuários Ativos', value: '12.5K', color: 'text-blue-400' },
-    { label: 'Apostas Hoje', value: '1.2M', color: 'text-yellow-400' },
+    { 
+      label: 'Usuários Ativos', 
+      value: statsData?.data?.total_usuarios?.toString() || '0', 
+      color: 'text-blue-400' 
+    },
+    { 
+      label: 'Apostas Hoje', 
+      value: statsData?.data?.total_apostas?.toString() || '0', 
+      color: 'text-yellow-400' 
+    },
   ];
 
   const featuredEvents = eventsData?.data?.map(event => {
@@ -56,12 +73,14 @@ const Home = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link
-                to="/register"
-                className="px-8 py-4 bg-red-600 text-white text-lg font-semibold rounded-lg hover:bg-red-700 transition-all duration-300 hover:shadow-lg transform hover:scale-105"
-              >
-                Comece a Apostar
-              </Link>
+              {!token && (
+                <Link
+                  to="/register"
+                  className="px-8 py-4 bg-red-600 text-white text-lg font-semibold rounded-lg hover:bg-red-700 transition-all duration-300 hover:shadow-lg transform hover:scale-105"
+                >
+                  Comece a Apostar
+                </Link>
+              )}
               <Link
                 to="/events"
                 className="px-8 py-4 border-2 border-gray-600 text-gray-300 text-lg font-semibold rounded-lg hover:border-red-500 hover:text-red-400 transition-all duration-300"
@@ -71,15 +90,28 @@ const Home = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
-              {stats.map((stat, index) => (
-                <div key={index} className="glass-card p-6 text-center hover-lift">
-                  <div className={`text-3xl font-bold ${stat.color} mb-2`}>
-                    {stat.value}
+            <div className="grid grid-cols-2 gap-6 mt-16 max-w-2xl mx-auto">
+              {isLoadingStats ? (
+                <>
+                  <div className="glass-card p-6 text-center hover-lift animate-pulse">
+                    <div className="h-8 bg-gray-700 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-700 rounded w-24 mx-auto"></div>
                   </div>
-                  <div className="text-gray-400 text-sm">{stat.label}</div>
-                </div>
-              ))}
+                  <div className="glass-card p-6 text-center hover-lift animate-pulse">
+                    <div className="h-8 bg-gray-700 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-700 rounded w-24 mx-auto"></div>
+                  </div>
+                </>
+              ) : (
+                stats.map((stat, index) => (
+                  <div key={index} className="glass-card p-6 text-center hover-lift">
+                    <div className={`text-3xl font-bold ${stat.color} mb-2`}>
+                      {stat.value}
+                    </div>
+                    <div className="text-gray-400 text-sm">{stat.label}</div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -98,7 +130,7 @@ const Home = () => {
               ? 'max-w-2xl mx-auto' 
               : 'md:grid-cols-2'
           }`}>
-            {isLoading ? (
+            {isLoadingEvents ? (
               <div className="text-center col-span-2">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
                 <p className="text-gray-400 mt-4">Carregando eventos...</p>
@@ -141,7 +173,7 @@ const Home = () => {
                   </div>
 
                   <Link
-                    to={`/events/${event.id}`}
+                    to={`/fights`}
                     className="block w-full py-3 bg-red-600 text-white text-center rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
                   >
                     Ver Detalhes
@@ -192,12 +224,14 @@ const Home = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/register"
-              className="px-8 py-4 bg-red-600 text-white text-lg font-semibold rounded-lg hover:bg-red-700 transition-all duration-300 hover:shadow-lg transform hover:scale-105"
-            >
-              Criar Conta Grátis
-            </Link>
+            {!token && (
+              <Link
+                to="/register"
+                className="px-8 py-4 bg-red-600 text-white text-lg font-semibold rounded-lg hover:bg-red-700 transition-all duration-300 hover:shadow-lg transform hover:scale-105"
+              >
+                Criar Conta Grátis
+              </Link>
+            )}
             <Link
               to="/leaderboard"
               className="px-8 py-4 border-2 border-gray-600 text-gray-300 text-lg font-semibold rounded-lg hover:border-red-500 hover:text-red-400 transition-all duration-300"
