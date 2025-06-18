@@ -48,13 +48,16 @@ const Aposta = () => {
         return;
       }
 
-      const payload = await fetch('http://localhost:3000/', {
+      const payload = await fetch('http://localhost:3000/api/token/conta/cliente', {
         method: 'GET',
         headers:  {
            'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         }
       });
+
+      const data2 = await payload.json();
+      const id_cliente = data2.payload.id_cliente;
 
       
       const response = await fetch('http://localhost:3000/api/ufc/', {
@@ -64,15 +67,17 @@ const Aposta = () => {
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
+          id_cliente: id_cliente,
+          id_evento: 1,
           id_luta: fight.id,
           vencedor: betData.winner,
           metodo: betData.method,
-          round: betData.round
+          rodada: betData.round
         }),
       });
 
       const data = await response.json();
-
+      console.log(data);
       if (!response.ok) {
         throw new Error(data.message || 'Erro ao fazer aposta');
       }

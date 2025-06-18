@@ -1,50 +1,72 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, Trophy, Target, TrendingUp, Users, Filter } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 
 const Fights = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const navigate = useNavigate();
 
-  const { data: eventsData, isLoading } = useQuery({
+  const { data: eventsData, isLoading: isLoadingEvents } = useQuery<any>({
     queryKey: ['events'],
     queryFn: async () => {
       const response = await fetch('http://localhost:3000/api/ufc/eventos');
       const data = await response.json();
-      console.log('Events data:', data);
       return data;
     }
   });
 
-  const fights = {
-    upcoming: eventsData?.data?.map(event => {
-      const fights = JSON.parse(event.lutas_evento);
-      return fights.map(fight => ({
-        id: `${event.id_evento}-${fight.id}`,
-        fighter1: { 
-          name: fight.redFighter, 
-          record: '0-0-0', // This would come from the API
-          rank: '#1', 
-          avatar: '/lovable-uploads/ef213dba-e1b7-4b1c-a649-99c8e1860342.png' 
+  const activeEvents = eventsData?.data?.filter((event: any) => event.status_evento === 1) || [];
+
+  const fightsQueries = useQueries({
+    queries: activeEvents.map((event: any) => ({
+      queryKey: ['fights', event.id_evento],
+      queryFn: async () => {
+        const response = await fetch(`http://localhost:3000/api/ufc/fights/${event.id_evento}`);
+        const data = await response.json();
+        return data;
+      },
+      enabled: !!event.id_evento
+    }))
+  });
+
+  // Group fights by event
+  const fightsByEvent = activeEvents.map((event: any, idx: number) => {
+    const fightsData = (fightsQueries[idx] && 'data' in fightsQueries[idx] && (fightsQueries[idx] as any).data) ? (fightsQueries[idx] as any).data : undefined;
+    const isLoadingFights = fightsQueries[idx]?.isLoading;
+    const fights = fightsData?.data || [];
+    return {
+      event,
+      isLoadingFights,
+      fights: fights.map((fight: any) => ({
+        id: `${event.id_evento}-${fight.id_luta}`,
+        fighter1: {
+          name: fight.red_fighter,
+          record: '0-0-0',
+          rank: '#1',
+          avatar: '/lovable-uploads/ef213dba-e1b7-4b1c-a649-99c8e1860342.png'
         },
-        fighter2: { 
-          name: fight.blueFighter, 
-          record: '0-0-0', // This would come from the API
-          rank: '#2', 
-          avatar: '/lovable-uploads/ef213dba-e1b7-4b1c-a649-99c8e1860342.png' 
+        fighter2: {
+          name: fight.blue_fighter,
+          record: '0-0-0',
+          rank: '#2',
+          avatar: '/lovable-uploads/ef213dba-e1b7-4b1c-a649-99c8e1860342.png'
         },
         event: event.nome_evento,
         date: event.created_at,
-        time: '22:00', // This would come from the API
-        weightClass: fight.weightClass,
-        title: fight.title || 'Luta Principal',
-        odds: { fighter1: 1.85, fighter2: 2.10 }, // This would come from the API
+        time: '22:00',
+        weightClass: fight.categoria,
+        title: fight.titulo || 'Luta Principal',
+        odds: { fighter1: 1.85, fighter2: 2.10 },
         analysis: 'Análise detalhada da luta'
-      }));
-    }).flat() || [],
-    live: [], // This would come from a live events API
-    finished: [] // This would come from a past events API
+      }))
+    };
+  });
+
+  const fights = {
+    upcoming: fightsByEvent.flatMap(e => e.fights),
+    live: [],
+    finished: []
   };
 
   const tabs = [
@@ -90,132 +112,152 @@ const Fights = () => {
         <div className="space-y-6">
           {/* Upcoming Fights */}
           {activeTab === 'upcoming' && (
-            <div className="space-y-6">
-              {isLoading ? (
+            <div className="space-y-12">
+              {isLoadingEvents ? (
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mx-auto"></div>
                   <p className="text-gray-400 mt-4">Carregando lutas...</p>
                 </div>
-              ) : fights.upcoming.length === 0 ? (
+              ) : fightsByEvent.length === 0 ? (
                 <div className="text-center py-16">
                   <Trophy className="w-16 h-16 text-gray-600 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-gray-400 mb-2">Nenhuma luta encontrada</h3>
                   <p className="text-gray-500">Não há lutas programadas no momento</p>
                 </div>
               ) : (
-                fights.upcoming.map((fight) => (
-                  <div key={fight.id} className="glass-card p-6 hover-lift animated-border">
-                    {/* Fight Header */}
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <h3 className="text-xl font-bold text-white">{fight.event}</h3>
-                        <p className="text-gray-400">{fight.weightClass} • {fight.title}</p>
-                      </div>
-                      <div className="text-right text-gray-400">
-                        <div className="flex items-center space-x-2">
+                fightsByEvent.map(({ event, isLoadingFights, fights }) => (
+                  <div key={event.id_evento}>
+                    <div className="mb-6">
+                      <h2 className="text-2xl font-bold text-white mb-1">{event.nome_evento}</h2>
+                      <div className="flex items-center space-x-4 text-gray-400 text-sm">
+                        <span className="flex items-center space-x-1">
                           <Calendar className="w-4 h-4" />
-                          <span>{new Date(fight.date).toLocaleDateString('pt-BR')}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 mt-1">
-                          <Clock className="w-4 h-4" />
-                          <span>{fight.time}</span>
-                        </div>
+                          <span>{new Date(event.data_evento).toLocaleDateString('pt-BR')}</span>
+                        </span>
+                        <span>{event.local_evento}</span>
                       </div>
                     </div>
-
-                    {/* Fighters */}
-                    <div className="grid md:grid-cols-3 gap-6 mb-6">
-                      {/* Fighter 1 */}
-                      <div className="text-center">
-                        <div className="relative mb-4">
-                          <div className="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full">
-                            {fight.fighter1.rank}
+                    {isLoadingFights ? (
+                      <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mb-4"></div>
+                        <p className="text-gray-400">Carregando lutas deste evento...</p>
+                      </div>
+                    ) : fights.length === 0 ? (
+                      <div className="text-center py-8">
+                        <Trophy className="w-12 h-12 text-gray-600 mx-auto mb-3" />
+                        <p className="text-gray-400 mb-3">Nenhuma luta cadastrada para este evento</p>
+                      </div>
+                    ) : (
+                      fights.map((fight) => (
+                        <div key={fight.id} className="glass-card p-6 hover-lift animated-border mb-8">
+                          {/* Fight Header */}
+                          <div className="flex items-center justify-between mb-6">
+                            <div>
+                              <h3 className="text-xl font-bold text-white">{fight.event}</h3>
+                              <p className="text-gray-400">{fight.weightClass} • {fight.title}</p>
+                            </div>
+                            <div className="text-right text-gray-400">
+                              <div className="flex items-center space-x-2">
+                                <Calendar className="w-4 h-4" />
+                                <span>{new Date(fight.date).toLocaleDateString('pt-BR')}</span>
+                              </div>
+                              <div className="flex items-center space-x-2 mt-1">
+                                <Clock className="w-4 h-4" />
+                                <span>{fight.time}</span>
+                              </div>
+                            </div>
+                          </div>
+                          {/* Fighters */}
+                          <div className="grid md:grid-cols-3 gap-6 mb-6">
+                            {/* Fighter 1 */}
+                            <div className="text-center">
+                              <div className="relative mb-4">
+                                <div className="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full">
+                                  {fight.fighter1.rank}
+                                </div>
+                              </div>
+                              <h4 className="text-lg font-semibold text-white mb-2">{fight.fighter1.name}</h4>
+                              <div className="bg-gray-800/30 rounded-lg p-3">
+                                <div className="text-sm text-gray-400">Red Corner</div>
+                                <div className="text-red-400 font-semibold mt-1">Desafiante</div>
+                              </div>
+                            </div>
+                            {/* VS */}
+                            <div className="flex items-center justify-center">
+                              <div className="text-center">
+                                <div className="text-4xl font-bold text-gradient mb-2">VS</div>
+                                <div className="bg-gray-800/30 rounded-lg p-3">
+                                  <div className="text-sm text-gray-400">Categoria</div>
+                                  <div className="text-white font-semibold mt-1">{fight.weightClass}</div>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Fighter 2 */}
+                            <div className="text-center">
+                              <div className="relative mb-4">
+                                <div className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+                                  {fight.fighter2.rank}
+                                </div>
+                              </div>
+                              <h4 className="text-lg font-semibold text-white mb-2">{fight.fighter2.name}</h4>
+                              <div className="bg-gray-800/30 rounded-lg p-3">
+                                <div className="text-sm text-gray-400">Blue Corner</div>
+                                <div className="text-blue-400 font-semibold mt-1">Campeão</div>
+                              </div>
+                            </div>
+                          </div>
+                          {/* Analysis */}
+                          <div className="bg-gray-800/30 rounded-lg p-4 mb-4">
+                            <h5 className="text-white font-semibold mb-2">Análise</h5>
+                            <p className="text-gray-400">{fight.analysis}</p>
+                          </div>
+                          {/* Stats */}
+                          <div className="grid grid-cols-3 gap-4 mb-6">
+                            <div className="bg-gray-800/30 rounded-lg p-3 text-center">
+                              <div className="text-gray-400 text-sm">Rounds</div>
+                              <div className="text-white font-semibold mt-1">
+                                {fights.indexOf(fight) <= 1 ? '5' : '3'}
+                              </div>
+                            </div>
+                            <div className="bg-gray-800/30 rounded-lg p-3 text-center">
+                              <div className="text-gray-400 text-sm">Duração</div>
+                              <div className="text-white font-semibold mt-1">
+                                {fights.indexOf(fight) <= 1 ? '25 min' : '15 min'}
+                              </div>
+                            </div>
+                            <div className="bg-gray-800/30 rounded-lg p-3 text-center">
+                              <div className="text-gray-400 text-sm">Título</div>
+                              <div className="text-white font-semibold mt-1">
+                                {fight.weightClass}
+                              </div>
+                            </div>
+                          </div>
+                          {/* Actions */}
+                          <div className="flex justify-center w-full">
+                            <button 
+                              onClick={() => navigate('/aposta', { 
+                                state: { 
+                                  fight: {
+                                    id: fight.id,
+                                    fighter1: fight.fighter1.name,
+                                    fighter2: fight.fighter2.name,
+                                    weightClass: fight.weightClass,
+                                    event: fight.event,
+                                    date: fight.date,
+                                    time: fight.time,
+                                    rounds: fights.indexOf(fight) <= 1 ? 5 : 3,
+                                    duration: fights.indexOf(fight) <= 1 ? '25 min' : '15 min'
+                                  }
+                                }
+                              })}
+                              className="w-full max-w-xl py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
+                            >
+                              Apostar Agora
+                            </button>
                           </div>
                         </div>
-                        <h4 className="text-lg font-semibold text-white mb-2">{fight.fighter1.name}</h4>
-                        <div className="bg-gray-800/30 rounded-lg p-3">
-                          <div className="text-sm text-gray-400">Red Corner</div>
-                          <div className="text-red-400 font-semibold mt-1">Desafiante</div>
-                        </div>
-                      </div>
-
-                      {/* VS */}
-                      <div className="flex items-center justify-center">
-                        <div className="text-center">
-                          <div className="text-4xl font-bold text-gradient mb-2">VS</div>
-                          <div className="bg-gray-800/30 rounded-lg p-3">
-                            <div className="text-sm text-gray-400">Categoria</div>
-                            <div className="text-white font-semibold mt-1">{fight.weightClass}</div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Fighter 2 */}
-                      <div className="text-center">
-                        <div className="relative mb-4">
-                          <div className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
-                            {fight.fighter2.rank}
-                          </div>
-                        </div>
-                        <h4 className="text-lg font-semibold text-white mb-2">{fight.fighter2.name}</h4>
-                        <div className="bg-gray-800/30 rounded-lg p-3">
-                          <div className="text-sm text-gray-400">Blue Corner</div>
-                          <div className="text-blue-400 font-semibold mt-1">Campeão</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Analysis */}
-                    <div className="bg-gray-800/30 rounded-lg p-4 mb-4">
-                      <h5 className="text-white font-semibold mb-2">Análise</h5>
-                      <p className="text-gray-400">{fight.analysis}</p>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="grid grid-cols-3 gap-4 mb-6">
-                      <div className="bg-gray-800/30 rounded-lg p-3 text-center">
-                        <div className="text-gray-400 text-sm">Rounds</div>
-                        <div className="text-white font-semibold mt-1">
-                          {fights.upcoming.indexOf(fight) <= 1 ? '5' : '3'}
-                        </div>
-                      </div>
-                      <div className="bg-gray-800/30 rounded-lg p-3 text-center">
-                        <div className="text-gray-400 text-sm">Duração</div>
-                        <div className="text-white font-semibold mt-1">
-                          {fights.upcoming.indexOf(fight) <= 1 ? '25 min' : '15 min'}
-                        </div>
-                      </div>
-                      <div className="bg-gray-800/30 rounded-lg p-3 text-center">
-                        <div className="text-gray-400 text-sm">Título</div>
-                        <div className="text-white font-semibold mt-1">
-                          {fight.weightClass}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex justify-center w-full">
-                      <button 
-                        onClick={() => navigate('/aposta', { 
-                          state: { 
-                            fight: {
-                              id: fight.id,
-                              fighter1: fight.fighter1.name,
-                              fighter2: fight.fighter2.name,
-                              weightClass: fight.weightClass,
-                              event: fight.event,
-                              date: fight.date,
-                              time: fight.time,
-                              rounds: fights.upcoming.indexOf(fight) <= 1 ? 5 : 3,
-                              duration: fights.upcoming.indexOf(fight) <= 1 ? '25 min' : '15 min'
-                            }
-                          }
-                        })}
-                        className="w-full max-w-xl py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
-                      >
-                        Apostar Agora
-                      </button>
-                    </div>
+                      ))
+                    )}
                   </div>
                 ))
               )}

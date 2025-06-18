@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Trophy, Target, TrendingUp, Users, Star } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueries } from '@tanstack/react-query';
 
 const Home = () => {
   const token = localStorage.getItem('token');
 
-  const { data: eventsData, isLoading: isLoadingEvents } = useQuery({
+  const { data: eventsData, isLoading: isLoadingEvents } = useQuery<any>({
     queryKey: ['events'],
     queryFn: async () => {
       const response = await fetch('http://localhost:3000/api/ufc/eventos');
@@ -38,21 +38,38 @@ const Home = () => {
     },
   ];
 
-  const featuredEvents = eventsData?.data?.map(event => {
-    const fights = JSON.parse(event.lutas_evento);
-    const mainEvent = fights[0]; // First fight is usually the main event
-    
+  // Fetch fights for each event using useQueries
+  const eventList = eventsData?.data || [];
+  const fightsQueries = useQueries({
+    queries: eventList.map((event: any) => ({
+      queryKey: ['fights', event.id_evento],
+      queryFn: async () => {
+        const response = await fetch(`http://localhost:3000/api/ufc/fights/${event.id_evento}`);
+        const data = await response.json();
+        return data;
+      },
+      enabled: !!event.id_evento
+    }))
+  });
+
+  const featuredEvents = eventList.map((event, idx) => {
+    const fightsData = (fightsQueries[idx] && 'data' in fightsQueries[idx] && (fightsQueries[idx] as any).data) ? (fightsQueries[idx] as any).data : undefined;
+    const isLoadingFights = fightsQueries[idx]?.isLoading;
+    const fights = fightsData?.data || [];
+    const mainEvent = fights[0];
     return {
       id: event.id_evento,
       title: event.nome_evento,
       date: new Date(event.created_at).toLocaleDateString('pt-BR'),
       location: event.local_evento,
-      fighters: [mainEvent.redFighter, mainEvent.blueFighter],
-      odds: { fighter1: 1.85, fighter2: 2.10 }, // These would come from a separate API
+      fighters: mainEvent ? [mainEvent.red_fighter, mainEvent.blue_fighter] : ['TBD', 'TBD'],
+      odds: { fighter1: 1.85, fighter2: 2.10 },
       image: '/lovable-uploads/ef213dba-e1b7-4b1c-a649-99c8e1860342.png',
-      weightClass: mainEvent.weightClass
+      weightClass: mainEvent?.categoria || 'TBD',
+      status: event.status_evento,
+      isLoadingFights
     };
-  }) || [];
+  });
 
   return (
     <div className="min-h-screen pt-16">
@@ -82,7 +99,7 @@ const Home = () => {
                 </Link>
               )}
               <Link
-                to="/events"
+                to="/fights"
                 className="px-8 py-4 border-2 border-gray-600 text-gray-300 text-lg font-semibold rounded-lg hover:border-red-500 hover:text-red-400 transition-all duration-300"
               >
                 Ver Eventos
@@ -172,12 +189,18 @@ const Home = () => {
                     </div>
                   </div>
 
-                  <Link
-                    to={`/fights`}
-                    className="block w-full py-3 bg-red-600 text-white text-center rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
-                  >
-                    Ver Detalhes
-                  </Link>
+                  {event.isLoadingFights ? (
+                    <div className="block w-full py-3 bg-gray-700 text-gray-400 text-center rounded-lg opacity-60 animate-pulse">Carregando luta principal...</div>
+                  ) : event.status === 1 ? (
+                    <Link
+                      to={`/fights`}
+                      className="block w-full py-3 bg-red-600 text-white text-center rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
+                    >
+                      Ver Detalhes
+                    </Link>
+                  ) : (
+                    <button disabled className="block w-full py-3 bg-gray-700 text-gray-400 text-center rounded-lg cursor-not-allowed opacity-60" title="Evento indisponível">Indisponível</button>
+                  )}
                 </div>
               ))
             )}
