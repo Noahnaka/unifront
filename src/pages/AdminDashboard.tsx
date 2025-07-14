@@ -84,6 +84,10 @@ const AdminDashboard = () => {
   });
   const [isUpdatingEventStatus, setIsUpdatingEventStatus] = useState<{ [eventId: number]: boolean }>({});
   const [isDeletingEvent, setIsDeletingEvent] = useState<{ [eventId: number]: boolean }>({});
+  const [showCloseEventModal, setShowCloseEventModal] = useState(false);
+  const [closeEventFights, setCloseEventFights] = useState<Fight[]>([]);
+  const [closeEventId, setCloseEventId] = useState<number | null>(null);
+  const [fightResults, setFightResults] = useState<{ [fightId: number]: { winner: string; method: string; round: string } }>({});
 
   const weightClasses = [
     'Flyweight',
@@ -98,6 +102,14 @@ const AdminDashboard = () => {
     'Women\'s Flyweight',
     'Women\'s Bantamweight',
     'Women\'s Featherweight'
+  ];
+
+  const finishMethods = [
+    'KO',
+    'Submission',
+    'Decision',
+    'DQ',
+    'No Contest',
   ];
 
   // Check authentication on component mount
@@ -493,6 +505,35 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleOpenCloseEventModal = (eventId: number) => {
+    setCloseEventId(eventId);
+    setCloseEventFights(getFightsForEvent(eventId));
+    setShowCloseEventModal(true);
+    // Initialize fightResults for this event
+    const initialResults: { [fightId: number]: { winner: string; method: string; round: string } } = {};
+    getFightsForEvent(eventId).forEach(fight => {
+      initialResults[fight.id_luta] = { winner: '', method: '', round: '' };
+    });
+    setFightResults(initialResults);
+  };
+
+  const handleCloseCloseEventModal = () => {
+    setShowCloseEventModal(false);
+    setCloseEventId(null);
+    setCloseEventFights([]);
+    setFightResults({});
+  };
+
+  const handleFightResultChange = (fightId: number, field: 'winner' | 'method' | 'round', value: string) => {
+    setFightResults(prev => ({
+      ...prev,
+      [fightId]: {
+        ...prev[fightId],
+        [field]: value,
+      },
+    }));
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950 flex items-center justify-center">
@@ -669,6 +710,13 @@ const AdminDashboard = () => {
                             {isUpdatingEventStatus[event.id_evento] && (
                               <span className="absolute right-1 animate-spin w-4 h-4 text-green-700"><svg className="w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg></span>
                             )}
+                          </button>
+                          <button
+                            onClick={() => handleOpenCloseEventModal(event.id_evento)}
+                            className="p-1 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/20 rounded transition-all duration-300 ml-2"
+                            title="Encerrar evento"
+                          >
+                            Encerrar
                           </button>
                           <button
                             onClick={() => handleDeleteEvent(event)}
@@ -1217,6 +1265,94 @@ const AdminDashboard = () => {
                 )}
               </button>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Close Event Modal */}
+      {showCloseEventModal && closeEventId && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="glass-card p-8 max-w-2xl w-full space-y-6 animated-border">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-white">Encerrar Evento</h2>
+              <button
+                onClick={handleCloseCloseEventModal}
+                className="text-gray-400 hover:text-white transition-colors duration-300"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="space-y-6">
+              {closeEventFights.length === 0 ? (
+                <div className="text-gray-400">Nenhuma luta encontrada para este evento.</div>
+              ) : (
+                closeEventFights.map(fight => (
+                  <div key={fight.id_luta} className="bg-gray-800/40 rounded-lg p-4 border border-gray-700 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="text-white font-semibold">{fight.red_fighter} <span className="text-gray-400">vs</span> {fight.blue_fighter}</div>
+                      <div className="text-xs text-gray-400">Luta #{fight.id_luta}</div>
+                    </div>
+                    <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0">
+                      {/* Winner */}
+                      <div>
+                        <label className="text-sm text-gray-300 mr-2">Vencedor:</label>
+                        <select
+                          className="bg-gray-900 border border-gray-700 rounded px-2 py-1 text-white"
+                          value={fightResults[fight.id_luta]?.winner || ''}
+                          onChange={e => handleFightResultChange(fight.id_luta, 'winner', e.target.value)}
+                        >
+                          <option value="">Selecione</option>
+                          <option value="red">{fight.red_fighter}</option>
+                          <option value="blue">{fight.blue_fighter}</option>
+                        </select>
+                      </div>
+                      {/* Method */}
+                      <div>
+                        <label className="text-sm text-gray-300 mr-2">Método:</label>
+                        <select
+                          className="bg-gray-900 border border-gray-700 rounded px-2 py-1 text-white"
+                          value={fightResults[fight.id_luta]?.method || ''}
+                          onChange={e => handleFightResultChange(fight.id_luta, 'method', e.target.value)}
+                        >
+                          <option value="">Selecione</option>
+                          {finishMethods.map(method => (
+                            <option key={method} value={method}>{method}</option>
+                          ))}
+                        </select>
+                      </div>
+                      {/* Round */}
+                      <div>
+                        <label className="text-sm text-gray-300 mr-2">Round:</label>
+                        <select
+                          className="bg-gray-900 border border-gray-700 rounded px-2 py-1 text-white"
+                          value={fightResults[fight.id_luta]?.round || ''}
+                          onChange={e => handleFightResultChange(fight.id_luta, 'round', e.target.value)}
+                        >
+                          <option value="">Selecione</option>
+                          {[1,2,3,4,5].map(r => (
+                            <option key={r} value={r}>{r}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+            <div className="flex justify-end space-x-2 pt-4">
+              <button
+                onClick={handleCloseCloseEventModal}
+                className="px-4 py-2 rounded bg-gray-700 text-gray-300 hover:bg-gray-600 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition-all font-semibold"
+                onClick={() => {console.log('Resultados:', fightResults); handleCloseCloseEventModal();}}
+              >
+                Confirmar Encerramento
+              </button>
+            </div>
           </div>
         </div>
       )}

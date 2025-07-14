@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Trophy, Calendar, Users, Target } from 'lucide-react';
 import AuthButtons from './AuthButtons';
@@ -6,6 +6,11 @@ import AuthButtons from './AuthButtons';
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const [hasToken, setHasToken] = useState(false);
+
+  useEffect(() => {
+    setHasToken(!!localStorage.getItem('token'));
+  }, []);
 
   const navItems = [
     { name: 'Home', path: '/', icon: Trophy },
@@ -16,18 +21,20 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 w-full z-50 glass-card border-b border-red-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <img 
-              src="/lovable-uploads/78360296-cdb9-4f57-bbd8-a809fa46aa25.png" 
-              alt="UNIBET" 
-              className="h-8 w-auto transform hover:scale-110 transition-transform duration-300"
-            />
-          </Link>
+        <div className="flex items-center h-16 w-full">
+          {/* Left: Logo */}
+          <div className="flex-shrink-0">
+            <Link to="/" className="flex items-center space-x-2">
+              <img 
+                src="/lovable-uploads/78360296-cdb9-4f57-bbd8-a809fa46aa25.png" 
+                alt="UNIBET" 
+                className="h-8 w-auto transform hover:scale-110 transition-transform duration-300"
+              />
+            </Link>
+          </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          {/* Center: Nav Items */}
+          <div className="hidden md:flex flex-1 justify-center items-center space-x-8">
             {navItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -47,23 +54,40 @@ const Navbar = () => {
             })}
           </div>
 
-          {/* Auth Buttons */}
-          <div className="hidden md:block">
-            <AuthButtons />
+          {/* Right: Auth + Points */}
+          <div className="flex items-center ml-auto space-x-4">
+            <div className="hidden md:block">
+              <AuthButtons />
+            </div>
+            {/* Points Section (Desktop, Far Right) */}
+            {hasToken && (
+              <div className="hidden md:flex items-center">
+                <span className="bg-red-500/20 text-red-400 border border-red-400 rounded-full px-4 py-1 font-semibold text-sm shadow-sm">
+                  Points: <span className="text-white font-bold">1,250</span>
+                </span>
+              </div>
+            )}
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden text-gray-300 hover:text-white transition-colors duration-300"
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-gray-300 hover:text-white transition-colors duration-300"
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
         </div>
 
         {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-4">
+            {/* Points Section (Mobile) */}
+            {hasToken && (
+              <div className="px-4 py-2">
+                <span className="bg-red-500/20 text-red-400 border border-red-400 rounded-full px-4 py-1 font-semibold text-sm shadow-sm">
+                  Points: <span className="text-white font-bold">1,250</span>
+                </span>
+              </div>
+            )}
             {navItems.map((item) => {
               const Icon = item.icon;
               return (

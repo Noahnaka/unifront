@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Trophy, Target, TrendingUp, Users, Filter } from 'lucide-react';
 import { useQuery, useQueries } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -6,6 +6,32 @@ import { useNavigate } from 'react-router-dom';
 const Fights = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const navigate = useNavigate();
+  const [userBets, setUserBets] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchUserBets = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const payload = await fetch('http://localhost:3000/api/token/conta/cliente', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await payload.json();
+        const id_cliente = data.payload.id_cliente;
+        const betsResponse = await fetch(`http://localhost:3000/api/ufc/user/bets?id_cliente=${id_cliente}`);
+        const betsData = await betsResponse.json();
+        setUserBets(betsData.data || []);
+        console.log('User bets:', betsData);
+      } catch (err) {
+        console.error('Erro ao buscar apostas do usuário:', err);
+      }
+    };
+    fetchUserBets();
+  }, []);
 
   const { data: eventsData, isLoading: isLoadingEvents } = useQuery<any>({
     queryKey: ['events'],
@@ -40,6 +66,7 @@ const Fights = () => {
       isLoadingFights,
       fights: fights.map((fight: any) => ({
         id: `${event.id_evento}-${fight.id_luta}`,
+        id_luta: fight.id_luta,
         fighter1: {
           name: fight.red_fighter,
           record: '0-0-0',
@@ -142,13 +169,13 @@ const Fights = () => {
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mb-4"></div>
                         <p className="text-gray-400">Carregando lutas deste evento...</p>
                       </div>
-                    ) : fights.length === 0 ? (
+                    ) : fights.filter(fight => !userBets.some(bet => bet.id_luta === fight.id_luta)).length === 0 ? (
                       <div className="text-center py-8">
                         <Trophy className="w-12 h-12 text-gray-600 mx-auto mb-3" />
                         <p className="text-gray-400 mb-3">Nenhuma luta cadastrada para este evento</p>
                       </div>
                     ) : (
-                      fights.map((fight) => (
+                      fights.filter(fight => !userBets.some(bet => bet.id_luta === fight.id_luta)).map((fight) => (
                         <div key={fight.id} className="glass-card p-6 hover-lift animated-border mb-8">
                           {/* Fight Header */}
                           <div className="flex items-center justify-between mb-6">
@@ -179,7 +206,7 @@ const Fights = () => {
                               <h4 className="text-lg font-semibold text-white mb-2">{fight.fighter1.name}</h4>
                               <div className="bg-gray-800/30 rounded-lg p-3">
                                 <div className="text-sm text-gray-400">Red Corner</div>
-                                <div className="text-red-400 font-semibold mt-1">Desafiante</div>
+                                <div className="text-red-400 font-semibold mt-1">redFighter</div>
                               </div>
                             </div>
                             {/* VS */}
@@ -202,7 +229,7 @@ const Fights = () => {
                               <h4 className="text-lg font-semibold text-white mb-2">{fight.fighter2.name}</h4>
                               <div className="bg-gray-800/30 rounded-lg p-3">
                                 <div className="text-sm text-gray-400">Blue Corner</div>
-                                <div className="text-blue-400 font-semibold mt-1">Campeão</div>
+                                <div className="text-blue-400 font-semibold mt-1">blueFighter</div>
                               </div>
                             </div>
                           </div>
@@ -234,11 +261,13 @@ const Fights = () => {
                           </div>
                           {/* Actions */}
                           <div className="flex justify-center w-full">
-                            <button 
-                              onClick={() => navigate('/aposta', { 
-                                state: { 
+                            <button
+                              onClick={() => navigate('/aposta', {
+                                state: {
                                   fight: {
                                     id: fight.id,
+                                    id_evento: event.id_evento, // Pass the event ID
+                                    id_luta: fight.id_luta,
                                     fighter1: fight.fighter1.name,
                                     fighter2: fight.fighter2.name,
                                     weightClass: fight.weightClass,

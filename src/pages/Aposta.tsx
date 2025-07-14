@@ -5,6 +5,8 @@ import { toast } from 'sonner';
 
 interface Fight {
   id: number;
+  id_evento: number; // Add event ID
+  id_luta: number;
   fighter1: string;
   fighter2: string;
   weightClass: string;
@@ -60,20 +62,22 @@ const Aposta = () => {
       const id_cliente = data2.payload.id_cliente;
 
       
+      const body = {
+        id_cliente: id_cliente,
+        id_evento: fight.id_evento,
+        id_luta: fight.id_luta,
+        vencedor: betData.winner === fight.fighter1 ? 'redFighter' : 'blueFighter',
+        metodo: betData.method,
+        rodada: betData.round
+      };
+      console.log('Bet body:', body);
       const response = await fetch('http://localhost:3000/api/ufc/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          id_cliente: id_cliente,
-          id_evento: 1,
-          id_luta: fight.id,
-          vencedor: betData.winner,
-          metodo: betData.method,
-          rodada: betData.round
-        }),
+        body: JSON.stringify(body),
       });
 
       const data = await response.json();
