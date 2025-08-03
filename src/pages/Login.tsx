@@ -30,6 +30,8 @@ const Login = () => {
       if (response.ok) {
         setStatus({ type: 'success', message: 'Login realizado com sucesso!' });
         localStorage.setItem('token', data.token);
+        // Dispatch custom event to notify other components about token change
+        window.dispatchEvent(new Event('tokenChanged'));
         navigate('/');
       } else {
         setStatus({ type: 'error', message: data.message || 'Erro ao fazer login' });

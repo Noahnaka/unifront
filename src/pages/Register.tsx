@@ -48,6 +48,7 @@ const Register = () => {
         throw new Error(data.message || 'Erro ao criar conta');
       }
       localStorage.setItem('token', data.token);
+      window.dispatchEvent(new Event('tokenChanged'));
       
       navigate('/');
     } catch (err) {
@@ -59,10 +60,33 @@ const Register = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    
+    if (name === 'phone') {
+      // Remove all non-digits
+      const digits = value.replace(/\D/g, '');
+      
+      // Format as (xx)99999-0000
+      let formatted = '';
+      if (digits.length > 0) {
+        formatted += '(' + digits.slice(0, 2);
+        if (digits.length > 2) {
+          formatted += ')' + digits.slice(2, 7);
+          if (digits.length > 7) {
+            formatted += '-' + digits.slice(7, 11);
+          }
+        }
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: formatted
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
   };
 
   return (

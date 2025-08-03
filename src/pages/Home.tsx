@@ -193,7 +193,7 @@ const Home = () => {
                     <div className="block w-full py-3 bg-gray-700 text-gray-400 text-center rounded-lg opacity-60 animate-pulse">Carregando luta principal...</div>
                   ) : event.status === 1 ? (
                     <Link
-                      to={`/fights`}
+                      to={token ? `/fights` : `/login`}
                       className="block w-full py-3 bg-red-600 text-white text-center rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
                     >
                       Ver Detalhes

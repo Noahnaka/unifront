@@ -8,6 +8,8 @@ const AuthButtons = () => {
 
   const handleLogout = () => {
     localStorage.clear();
+    // Dispatch custom event to notify other components about token change
+    window.dispatchEvent(new Event('tokenChanged'));
     navigate('/');
   };
 

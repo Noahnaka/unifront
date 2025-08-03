@@ -7,16 +7,97 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const [hasToken, setHasToken] = useState(false);
+  const [points, setPoints] = useState<number | null>(null);
+  const [isLoadingPoints, setIsLoadingPoints] = useState(false);
 
   useEffect(() => {
-    setHasToken(!!localStorage.getItem('token'));
+    const checkToken = () => {
+      setHasToken(!!localStorage.getItem('token'));
+    };
+
+    // Check token on mount
+    checkToken();
+
+    // Listen for storage changes (when token is added/removed from other tabs/windows)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'token') {
+        checkToken();
+      }
+    };
+
+    // Listen for custom events (when token changes in same tab)
+    const handleTokenChange = () => {
+      checkToken();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('tokenChanged', handleTokenChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('tokenChanged', handleTokenChange);
+    };
   }, []);
+
+  useEffect(() => {
+    const fetchPoints = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setPoints(null);
+        return;
+      }
+
+      setIsLoadingPoints(true);
+      try {
+
+        const token = localStorage.getItem('token');
+        const id = await fetch('http://localhost:3000/api/token/conta/cliente', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const idData = await id.json();
+        const idCliente = idData.payload.id_cliente;
+
+        const response = await fetch(`http://localhost:3000/api/cliente/pontos/${idCliente}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+        if (response.ok && data.data) {
+          setPoints(data.data.pontos_cliente);
+        } else {
+          setPoints(null);
+        }
+      } catch (err) {
+        console.error('Error fetching points:', err);
+        setPoints(null);
+      } finally {
+        setIsLoadingPoints(false);
+      }
+    };
+
+    if (hasToken) {
+      fetchPoints();
+    }
+  }, [hasToken]);
 
   const navItems = [
     { name: 'Home', path: '/', icon: Trophy },
-    { name: 'Lutas', path: '/fights', icon: Target },
+    ...(hasToken ? [{ name: 'Lutas', path: '/fights', icon: Target }] : []),
     { name: 'Ranking', path: '/leaderboard', icon: Trophy },
   ];
+
+  const formatPoints = (points: number | null) => {
+    if (points === null) return '0';
+    return points.toLocaleString();
+  };
 
   return (
     <nav className="fixed top-0 w-full z-50 glass-card border-b border-red-500/20">
@@ -63,7 +144,13 @@ const Navbar = () => {
             {hasToken && (
               <div className="hidden md:flex items-center">
                 <span className="bg-red-500/20 text-red-400 border border-red-400 rounded-full px-4 py-1 font-semibold text-sm shadow-sm">
-                  Points: <span className="text-white font-bold">1,250</span>
+                  Points: <span className="text-white font-bold">
+                    {isLoadingPoints ? (
+                      <span className="animate-pulse">...</span>
+                    ) : (
+                      formatPoints(points)
+                    )}
+                  </span>
                 </span>
               </div>
             )}
@@ -84,7 +171,13 @@ const Navbar = () => {
             {hasToken && (
               <div className="px-4 py-2">
                 <span className="bg-red-500/20 text-red-400 border border-red-400 rounded-full px-4 py-1 font-semibold text-sm shadow-sm">
-                  Points: <span className="text-white font-bold">1,250</span>
+                  Points: <span className="text-white font-bold">
+                    {isLoadingPoints ? (
+                      <span className="animate-pulse">...</span>
+                    ) : (
+                      formatPoints(points)
+                    )}
+                  </span>
                 </span>
               </div>
             )}

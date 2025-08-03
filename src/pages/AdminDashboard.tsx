@@ -88,6 +88,8 @@ const AdminDashboard = () => {
   const [closeEventFights, setCloseEventFights] = useState<Fight[]>([]);
   const [closeEventId, setCloseEventId] = useState<number | null>(null);
   const [fightResults, setFightResults] = useState<{ [fightId: number]: { winner: string; method: string; round: string } }>({});
+  const [isClosingEvent, setIsClosingEvent] = useState(false);
+  const [isEndingEvent, setIsEndingEvent] = useState<{ [eventId: number]: boolean }>({});
 
   const weightClasses = [
     'Flyweight',
@@ -716,6 +718,40 @@ const AdminDashboard = () => {
                             className="p-1 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/20 rounded transition-all duration-300 ml-2"
                             title="Encerrar evento"
                           >
+                            Vencedores
+                          </button>
+                          <button
+                            onClick={async () => {
+                              setIsEndingEvent(prev => ({ ...prev, [event.id_evento]: true }));
+                              try {
+                                const adminToken = localStorage.getItem('adminToken');
+                                const response = await fetch('http://localhost:3000/api/pontos', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${adminToken}`
+                                  },
+                                  body: JSON.stringify({ id_evento: event.id_evento }),
+                                });
+                                const data = await response.json();
+                                console.log(data);
+                                if (response.ok && data.status) {
+                                  toast.success('Evento encerrado com sucesso!');
+                                  fetchEvents();
+                                } else {
+                                  toast.error(data.message || 'Erro ao encerrar evento');
+                                }
+                              } catch (error) {
+                                toast.error('Erro ao conectar com o servidor');
+                                console.error('Encerrar evento error:', error);
+                              } finally {
+                                setIsEndingEvent(prev => ({ ...prev, [event.id_evento]: false }));
+                              }
+                            }}
+                            disabled={isEndingEvent[event.id_evento]}
+                            className="p-1 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded transition-all duration-300 ml-2"
+                            title="Encerrar evento"
+                          >
                             Encerrar
                           </button>
                           <button
@@ -1302,8 +1338,8 @@ const AdminDashboard = () => {
                           onChange={e => handleFightResultChange(fight.id_luta, 'winner', e.target.value)}
                         >
                           <option value="">Selecione</option>
-                          <option value="red">{fight.red_fighter}</option>
-                          <option value="blue">{fight.blue_fighter}</option>
+                          <option value="redFighter">{fight.red_fighter}</option>
+                          <option value="blueFighter">{fight.blue_fighter}</option>
                         </select>
                       </div>
                       {/* Method */}
@@ -1348,7 +1384,52 @@ const AdminDashboard = () => {
               </button>
               <button
                 className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition-all font-semibold"
-                onClick={() => {console.log('Resultados:', fightResults); handleCloseCloseEventModal();}}
+                disabled={isClosingEvent}
+                onClick={async () => {
+                  setIsClosingEvent(true);
+                  const results = closeEventFights.map(fight => {
+                    const res: any = fightResults[fight.id_luta] || {};
+                    let winnerName = '';
+                    if (res.winner === 'redFighter') winnerName = fight.red_fighter;
+                    else if (res.winner === 'blueFighter') winnerName = fight.blue_fighter;
+                    return {
+                      id_evento: fight.id_evento,
+                      id_luta: fight.id_luta,
+                      winner: res.winner,
+                      method: res.method || '',
+                      round: res.round || '',
+                    };
+                  });
+                  try {
+                    const adminToken = localStorage.getItem('adminToken');
+                    const responses = await Promise.all(results.map(async (fightResult) => {
+                      const response = await fetch('http://localhost:3000/api/ufc/vencedor', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${adminToken}`
+                        },
+                        body: JSON.stringify(fightResult),
+                      });
+                      const data = await response.json();
+                      return { ok: response.ok, status: data.status, message: data.message };
+                    }));
+                    const allOk = responses.every(r => r.ok && r.status);
+                    if (allOk) {
+                      toast.success('Evento encerrado com sucesso!');
+                      handleCloseCloseEventModal();
+                      fetchEvents();
+                    } else {
+                      const firstError = responses.find(r => !r.ok || !r.status);
+                      toast.error(firstError?.message || 'Erro ao encerrar evento');
+                    }
+                  } catch (error) {
+                    toast.error('Erro ao conectar com o servidor');
+                    console.error('Close event error:', error);
+                  } finally {
+                    setIsClosingEvent(false);
+                  }
+                }}
               >
                 Confirmar Encerramento
               </button>
