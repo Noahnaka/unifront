@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, Clock, Trophy, Target, TrendingUp, Users, Filter } from 'lucide-react';
 import { useQuery, useQueries } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +7,7 @@ const Fights = () => {
   const [activeTab, setActiveTab] = useState('upcoming');
   const navigate = useNavigate();
   const [userBets, setUserBets] = useState<any[]>([]);
+  const [fightOdds, setFightOdds] = useState<any>({});
 
   useEffect(() => {
     const fetchUserBets = async () => {
@@ -89,6 +90,33 @@ const Fights = () => {
       }))
     };
   });
+
+  const fetchedOddsRef = useRef<Set<string | number>>(new Set());
+
+  useEffect(() => {
+    fightsByEvent.forEach(({ fights }) => {
+      fights.forEach((fight: any) => {
+        const fightId = fight.id_luta;
+        if (!fetchedOddsRef.current.has(fightId)) {
+          fetchedOddsRef.current.add(fightId);
+          fetch(`http://localhost:3000/api/ufc/lutas/odds/${fightId}`)
+            .then(res => res.json())
+            .then(data => {
+              const items = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);
+              const redCount = items.filter((b: any) => b.vencedor === 'redFighter').length;
+              const blueCount = items.filter((b: any) => b.vencedor === 'blueFighter').length;
+              setFightOdds((prev: any) => ({
+                ...prev,
+                [fightId]: { redCount, blueCount }
+              }));
+            })
+            .catch(err => {
+              console.error('Erro ao buscar odds da luta', fightId, err);
+            });
+        }
+      });
+    });
+  }, [fightsByEvent]);
 
   const fights = {
     upcoming: fightsByEvent.flatMap(e => e.fights),
@@ -208,6 +236,35 @@ const Fights = () => {
                                 <div className="text-sm text-gray-400">Red Corner</div>
                                 <div className="text-red-400 font-semibold mt-1">redFighter</div>
                               </div>
+                              <div className="mt-2">
+                                {fightOdds[fight.id_luta]
+                                  ? (
+                                    fightOdds[fight.id_luta].redCount === fightOdds[fight.id_luta].blueCount
+                                      ? (
+                                        <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-300 bg-gray-700">
+                                          -
+                                        </span>
+                                      )
+                                      : (
+                                        fightOdds[fight.id_luta].redCount > fightOdds[fight.id_luta].blueCount
+                                          ? (
+                                            <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold border border-green-600/30 text-green-400 bg-green-600/20">
+                                              Favorite
+                                            </span>
+                                          )
+                                          : (
+                                            <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold border border-yellow-600/30 text-yellow-400 bg-yellow-600/20">
+                                              Underdog
+                                            </span>
+                                          )
+                                      )
+                                  )
+                                  : (
+                                    <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-300 bg-gray-700">
+                                      -
+                                    </span>
+                                  )}
+                              </div>
                             </div>
                             {/* VS */}
                             <div className="flex items-center justify-center">
@@ -230,6 +287,35 @@ const Fights = () => {
                               <div className="bg-gray-800/30 rounded-lg p-3">
                                 <div className="text-sm text-gray-400">Blue Corner</div>
                                 <div className="text-blue-400 font-semibold mt-1">blueFighter</div>
+                              </div>
+                              <div className="mt-2">
+                                {fightOdds[fight.id_luta]
+                                  ? (
+                                    fightOdds[fight.id_luta].redCount === fightOdds[fight.id_luta].blueCount
+                                      ? (
+                                        <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-300 bg-gray-700">
+                                          -
+                                        </span>
+                                      )
+                                      : (
+                                        fightOdds[fight.id_luta].blueCount > fightOdds[fight.id_luta].redCount
+                                          ? (
+                                            <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold border border-green-600/30 text-green-400 bg-green-600/20">
+                                              Favorite
+                                            </span>
+                                          )
+                                          : (
+                                            <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold border border-yellow-600/30 text-yellow-400 bg-yellow-600/20">
+                                              Underdog
+                                            </span>
+                                          )
+                                      )
+                                  )
+                                  : (
+                                    <span className="inline-block px-2 py-1 rounded-full text-xs font-semibold border border-gray-600 text-gray-300 bg-gray-700">
+                                      -
+                                    </span>
+                                  )}
                               </div>
                             </div>
                           </div>
