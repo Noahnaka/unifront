@@ -8,6 +8,12 @@ const Fights = () => {
   const navigate = useNavigate();
   const [userBets, setUserBets] = useState<any[]>([]);
   const [fightOdds, setFightOdds] = useState<any>({});
+  const [isPremium, setIsPremium] = useState(false);
+
+  useEffect(() => {
+    // Check premium status
+    setIsPremium(localStorage.getItem('acesso') === 'premium');
+  }, []);
 
   useEffect(() => {
     const fetchUserBets = async () => {
@@ -346,29 +352,55 @@ const Fights = () => {
                             </div>
                           </div>
                           {/* Actions */}
-                          <div className="flex justify-center w-full">
-                            <button
-                              onClick={() => navigate('/aposta', {
-                                state: {
-                                  fight: {
-                                    id: fight.id,
-                                    id_evento: event.id_evento, // Pass the event ID
-                                    id_luta: fight.id_luta,
-                                    fighter1: fight.fighter1.name,
-                                    fighter2: fight.fighter2.name,
-                                    weightClass: fight.weightClass,
-                                    event: fight.event,
-                                    date: fight.date,
-                                    time: fight.time,
-                                    rounds: fights.indexOf(fight) <= 1 ? 5 : 3,
-                                    duration: fights.indexOf(fight) <= 1 ? '25 min' : '15 min'
+                          <div className="relative w-full">
+                            {isPremium && (
+                              <button
+                                onClick={() => navigate('/analise-avancada', {
+                                  state: {
+                                    fight: {
+                                      id: fight.id,
+                                      id_evento: event.id_evento,
+                                      id_luta: fight.id_luta,
+                                      fighter1: fight.fighter1.name,
+                                      fighter2: fight.fighter2.name,
+                                      weightClass: fight.weightClass,
+                                      event: fight.event,
+                                      date: fight.date,
+                                      time: fight.time,
+                                      rounds: fights.indexOf(fight) <= 1 ? 5 : 3,
+                                      duration: fights.indexOf(fight) <= 1 ? '25 min' : '15 min'
+                                    }
                                   }
-                                }
-                              })}
-                              className="w-full max-w-xl py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
-                            >
-                              Apostar Agora
-                            </button>
+                                })}
+                                className="absolute left-0 bottom-0 px-4 py-2 bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 text-white rounded-lg hover:from-amber-300 hover:via-yellow-400 hover:to-orange-400 transition-all duration-500 font-medium text-sm shadow-lg hover:shadow-xl border border-amber-300/40 hover:border-amber-200/60"
+                              >
+                                Análise Avançada
+                              </button>
+                            )}
+                            <div className="flex justify-center w-full">
+                              <button
+                                onClick={() => navigate('/aposta', {
+                                  state: {
+                                    fight: {
+                                      id: fight.id,
+                                      id_evento: event.id_evento, // Pass the event ID
+                                      id_luta: fight.id_luta,
+                                      fighter1: fight.fighter1.name,
+                                      fighter2: fight.fighter2.name,
+                                      weightClass: fight.weightClass,
+                                      event: fight.event,
+                                      date: fight.date,
+                                      time: fight.time,
+                                      rounds: fights.indexOf(fight) <= 1 ? 5 : 3,
+                                      duration: fights.indexOf(fight) <= 1 ? '25 min' : '15 min'
+                                    }
+                                  }
+                                })}
+                                className="w-full max-w-xl py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
+                              >
+                                Apostar Agora
+                              </button>
+                            </div>
                           </div>
                         </div>
                       ))

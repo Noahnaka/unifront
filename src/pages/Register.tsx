@@ -48,6 +48,7 @@ const Register = () => {
         throw new Error(data.message || 'Erro ao criar conta');
       }
       localStorage.setItem('token', data.token);
+      localStorage.setItem('acesso', 'cliente')
       window.dispatchEvent(new Event('tokenChanged'));
       
       navigate('/');

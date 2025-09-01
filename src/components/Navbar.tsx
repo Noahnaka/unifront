@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Trophy, Calendar, Users, Target } from 'lucide-react';
+import { Menu, X, Trophy, Calendar, Users, Target, Crown } from 'lucide-react';
 import AuthButtons from './AuthButtons';
 
 const Navbar = () => {
@@ -9,10 +9,12 @@ const Navbar = () => {
   const [hasToken, setHasToken] = useState(false);
   const [points, setPoints] = useState<number | null>(null);
   const [isLoadingPoints, setIsLoadingPoints] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
 
   useEffect(() => {
     const checkToken = () => {
       setHasToken(!!localStorage.getItem('token'));
+      setIsPremium(localStorage.getItem('acesso') === 'premium');
     };
 
     // Check token on mount
@@ -20,7 +22,7 @@ const Navbar = () => {
 
     // Listen for storage changes (when token is added/removed from other tabs/windows)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'token') {
+      if (e.key === 'token' || e.key === 'acesso') {
         checkToken();
       }
     };
@@ -99,20 +101,29 @@ const Navbar = () => {
     return points.toLocaleString();
   };
 
-  return (
-    <nav className="fixed top-0 w-full z-50 glass-card border-b border-red-500/20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center h-16 w-full">
-          {/* Left: Logo */}
-          <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center space-x-2">
-              <img 
-                src="/lovable-uploads/78360296-cdb9-4f57-bbd8-a809fa46aa25.png" 
-                alt="UNIBET" 
-                className="h-8 w-auto transform hover:scale-110 transition-transform duration-300"
-              />
-            </Link>
-          </div>
+     return (
+     <nav className="fixed top-0 w-full z-50 glass-card border-b border-red-500/20">
+       {/* Premium Badge - Absolute Far Left */}
+       {isPremium && (
+         <div className="absolute left-0 top-0 z-10 flex items-center space-x-1 p-4">
+           <Crown className="w-4 h-4 text-yellow-400" />
+           <span className="text-yellow-400 text-xs font-semibold bg-yellow-400/10 px-2 py-1 rounded-full border border-yellow-400/30">
+             PREMIUM
+           </span>
+         </div>
+       )}
+       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+         <div className="flex items-center h-16 w-full">
+           {/* Left: Logo */}
+           <div className="flex-shrink-0 flex items-center">
+             <Link to="/" className="flex items-center space-x-2">
+               <img 
+                 src="/lovable-uploads/78360296-cdb9-4f57-bbd8-a809fa46aa25.png" 
+                 alt="UNIBET" 
+                 className="h-8 w-auto transform hover:scale-110 transition-transform duration-300"
+               />
+             </Link>
+           </div>
 
           {/* Center: Nav Items */}
           <div className="hidden md:flex flex-1 justify-center items-center space-x-8">

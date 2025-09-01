@@ -264,6 +264,27 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Premium Section */}
+      {token && localStorage.getItem('acesso') !== 'premium' && (
+        <section className="py-20 bg-black/30">
+          <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+            <h2 className="text-4xl font-bold text-white mb-4">Deseja melhorar suas apostas?</h2>
+            <p className="text-gray-400 text-lg mb-8">
+              Vire membro Premium da UNIBET
+            </p>
+            
+            <div className="flex justify-center">
+              <Link
+                to="/premium"
+                className="px-8 py-4 border-2 border-gray-600 text-gray-300 text-lg font-semibold rounded-lg hover:border-red-500 hover:text-red-400 transition-all duration-300"
+              >
+                Ver Detalhes
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 };

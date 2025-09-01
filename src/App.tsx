@@ -14,6 +14,8 @@ import NotFound from "./pages/NotFound";
 import Aposta from "./pages/Aposta";
 import Admin from "./pages/Admin";
 import AdminDashboard from "./pages/AdminDashboard";
+import Premium from "./pages/Premium";
+import AnaliseAvancada from "./pages/AnaliseAvancada";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,8 @@ const AppContent = () => {
         <Route path="/betting" element={<Betting />} />
         <Route path="/leaderboard" element={<Leaderboard />} />
         <Route path="/aposta" element={<Aposta />} />
+        <Route path="/premium" element={<Premium />} />
+        <Route path="/analise-avancada" element={<AnaliseAvancada />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="*" element={<NotFound />} />

@@ -30,7 +30,7 @@ const Login = () => {
       if (response.ok) {
         setStatus({ type: 'success', message: 'Login realizado com sucesso!' });
         localStorage.setItem('token', data.token);
-        // Dispatch custom event to notify other components about token change
+        localStorage.setItem('acesso', data.data.nivel_acesso_cliente)
         window.dispatchEvent(new Event('tokenChanged'));
         navigate('/');
       } else {
