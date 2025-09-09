@@ -79,12 +79,12 @@ const Home = () => {
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="space-y-8 animate-in fade-in duration-1000">
-            <h1 className="text-6xl md:text-8xl font-bold leading-tight">
+            <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold leading-tight">
               <span className="block text-white">APOSTE NA</span>
-              <span className="block text-gradient text-7xl md:text-9xl">VITÓRIA</span>
+              <span className="block text-gradient text-5xl sm:text-7xl md:text-9xl">VITÓRIA</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-base sm:text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto px-2">
               A plataforma mais completa para apostas em artes marciais. 
               Análises profissionais, odds competitivas e transmissões ao vivo.
             </p>
@@ -107,7 +107,7 @@ const Home = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 gap-6 mt-16 max-w-2xl mx-auto">
+            <div className="grid grid-cols-2 gap-4 sm:gap-6 mt-10 sm:mt-16 max-w-2xl mx-auto">
               {isLoadingStats ? (
                 <>
                   <div className="glass-card p-6 text-center hover-lift animate-pulse">
@@ -138,11 +138,11 @@ const Home = () => {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Próximos Eventos</h2>
-            <p className="text-gray-400 text-lg">Não perca as melhores lutas e oportunidades de apostas</p>
+            <h2 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4">Próximos Eventos</h2>
+            <p className="text-gray-400 text-base sm:text-lg px-2">Não perca as melhores lutas e oportunidades de apostas</p>
           </div>
 
-          <div className={`grid gap-8 ${
+          <div className={`grid gap-6 sm:gap-8 ${
             featuredEvents.length === 1 
               ? 'max-w-2xl mx-auto' 
               : 'md:grid-cols-2'
@@ -171,7 +171,7 @@ const Home = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 mb-6">
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
                     <div className="text-center">
                       <div className="text-lg font-semibold text-white">{event.fighters[0]}</div>
                       <div className="text-gray-400 text-sm mt-1">Red Corner</div>
@@ -182,7 +182,7 @@ const Home = () => {
                     </div>
                   </div>
 
-                  <div className="bg-gray-800/30 rounded-lg p-3 mb-6">
+                  <div className="bg-gray-800/30 rounded-lg p-3 mb-6 text-sm sm:text-base">
                     <div className="text-center">
                       <div className="text-gray-400 text-sm">Weight Class</div>
                       <div className="text-white font-semibold mt-1">{event.weightClass || 'N/A'}</div>
@@ -199,7 +199,7 @@ const Home = () => {
                       Ver Detalhes
                     </Link>
                   ) : (
-                    <button disabled className="block w-full py-3 bg-gray-700 text-gray-400 text-center rounded-lg cursor-not-allowed opacity-60" title="Evento indisponível">Indisponível</button>
+                    <button disabled className="block w-full py-3 bg-gray-700 text-gray-400 text-center rounded-lg cursor-not-allowed opacity-60 text-sm sm:text-base" title="Evento indisponível">Indisponível</button>
                   )}
                 </div>
               ))
@@ -212,11 +212,11 @@ const Home = () => {
       <section className="py-20 bg-black/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">Por que escolher UNIBET?</h2>
-            <p className="text-gray-400 text-lg">A experiência de apostas mais completa do mercado</p>
+            <h2 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4">Por que escolher UNIBET?</h2>
+            <p className="text-gray-400 text-base sm:text-lg">A experiência de apostas mais completa do mercado</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
             <div className="glass-card p-8 text-center hover-lift">
               <Trophy className="w-12 h-12 text-red-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-white mb-3">Odds Competitivas</h3>
@@ -241,8 +241,8 @@ const Home = () => {
       {/* CTA Section */}
       <section className="py-20">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-white mb-4">Pronto para começar?</h2>
-          <p className="text-gray-400 text-lg mb-8">
+          <h2 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4">Pronto para começar?</h2>
+          <p className="text-gray-400 text-base sm:text-lg mb-6 sm:mb-8 px-2">
             Junte-se a milhares de apostadores que já confiam na UNIBET
           </p>
           
@@ -269,8 +269,8 @@ const Home = () => {
       {token && localStorage.getItem('acesso') !== 'premium' && (
         <section className="py-20 bg-black/30">
           <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-            <h2 className="text-4xl font-bold text-white mb-4">Deseja melhorar suas apostas?</h2>
-            <p className="text-gray-400 text-lg mb-8">
+            <h2 className="text-2xl sm:text-4xl font-bold text-white mb-2 sm:mb-4">Deseja melhorar suas apostas?</h2>
+            <p className="text-gray-400 text-base sm:text-lg mb-6 sm:mb-8">
               Vire membro Premium da UNIBET
             </p>
             

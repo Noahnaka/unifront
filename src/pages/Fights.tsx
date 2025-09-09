@@ -138,21 +138,21 @@ const Fights = () => {
     <div className="min-h-screen pt-16 bg-gradient-to-br from-black via-gray-900 to-red-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-gradient mb-4">Lutas</h1>
-          <p className="text-gray-400 text-lg">Acompanhe todas as lutas com análises detalhadas</p>
+        <div className="text-center mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-6xl font-bold text-gradient mb-3 md:mb-4">Lutas</h1>
+          <p className="text-gray-400 text-base md:text-lg">Acompanhe todas as lutas com análises detalhadas</p>
         </div>
 
         {/* Tabs */}
         <div className="flex justify-center mb-8">
-          <div className="glass-card p-2 flex space-x-2">
+          <div className="glass-card p-1 sm:p-2 flex space-x-1 sm:space-x-2">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
+                  className={`flex items-center space-x-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-medium transition-all duration-300 ${
                     activeTab === tab.id
                       ? 'bg-red-600 text-white neon-glow'
                       : 'text-gray-300 hover:text-white hover:bg-gray-700'
@@ -180,7 +180,7 @@ const Fights = () => {
                   <p className="text-gray-400 mt-4">Carregando lutas...</p>
                 </div>
               ) : fightsByEvent.length === 0 ? (
-                <div className="text-center py-16">
+                <div className="text-center py-12 sm:py-16">
                   <Trophy className="w-16 h-16 text-gray-600 mx-auto mb-4" />
                   <h3 className="text-xl font-semibold text-gray-400 mb-2">Nenhuma luta encontrada</h3>
                   <p className="text-gray-500">Não há lutas programadas no momento</p>
@@ -199,7 +199,7 @@ const Fights = () => {
                       </div>
                     </div>
                     {isLoadingFights ? (
-                      <div className="text-center py-8">
+                      <div className="text-center py-6 sm:py-8">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mb-4"></div>
                         <p className="text-gray-400">Carregando lutas deste evento...</p>
                       </div>
@@ -210,7 +210,7 @@ const Fights = () => {
                       </div>
                     ) : (
                       fights.filter(fight => !userBets.some(bet => bet.id_luta === fight.id_luta)).map((fight) => (
-                        <div key={fight.id} className="glass-card p-6 hover-lift animated-border mb-8">
+                        <div key={fight.id} className="glass-card p-4 sm:p-6 hover-lift animated-border mb-8">
                           {/* Fight Header */}
                           <div className="flex items-center justify-between mb-6">
                             <div>
@@ -229,7 +229,7 @@ const Fights = () => {
                             </div>
                           </div>
                           {/* Fighters */}
-                          <div className="grid md:grid-cols-3 gap-6 mb-6">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6">
                             {/* Fighter 1 */}
                             <div className="text-center">
                               <div className="relative mb-4">
@@ -326,25 +326,25 @@ const Fights = () => {
                             </div>
                           </div>
                           {/* Analysis */}
-                          <div className="bg-gray-800/30 rounded-lg p-4 mb-4">
+                          <div className="bg-gray-800/30 rounded-lg p-3 sm:p-4 mb-4">
                             <h5 className="text-white font-semibold mb-2">Análise</h5>
                             <p className="text-gray-400">{fight.analysis}</p>
                           </div>
                           {/* Stats */}
-                          <div className="grid grid-cols-3 gap-4 mb-6">
-                            <div className="bg-gray-800/30 rounded-lg p-3 text-center">
+                          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-6">
+                            <div className="bg-gray-800/30 rounded-lg p-2.5 sm:p-3 text-center">
                               <div className="text-gray-400 text-sm">Rounds</div>
                               <div className="text-white font-semibold mt-1">
                                 {fights.indexOf(fight) <= 1 ? '5' : '3'}
                               </div>
                             </div>
-                            <div className="bg-gray-800/30 rounded-lg p-3 text-center">
+                            <div className="bg-gray-800/30 rounded-lg p-2.5 sm:p-3 text-center">
                               <div className="text-gray-400 text-sm">Duração</div>
                               <div className="text-white font-semibold mt-1">
                                 {fights.indexOf(fight) <= 1 ? '25 min' : '15 min'}
                               </div>
                             </div>
-                            <div className="bg-gray-800/30 rounded-lg p-3 text-center">
+                            <div className="bg-gray-800/30 rounded-lg p-2.5 sm:p-3 text-center">
                               <div className="text-gray-400 text-sm">Título</div>
                               <div className="text-white font-semibold mt-1">
                                 {fight.weightClass}

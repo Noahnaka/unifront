@@ -85,13 +85,13 @@ const Betting = () => {
     <div className="min-h-screen pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-gradient mb-4">Apostas</h1>
-          <p className="text-gray-400 text-lg">Faça suas apostas com as melhores odds do mercado</p>
+        <div className="text-center mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-6xl font-bold text-gradient mb-3 md:mb-4">Apostas</h1>
+          <p className="text-gray-400 text-base md:text-lg">Faça suas apostas com as melhores odds do mercado</p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
           <div className="glass-card p-6 text-center">
             <DollarSign className="w-8 h-8 text-green-400 mx-auto mb-2" />
             <div className="text-2xl font-bold text-white">R$ 2.450</div>
@@ -114,14 +114,14 @@ const Betting = () => {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Betting Options */}
           <div className="lg:col-span-2">
             {/* Tabs */}
-            <div className="flex space-x-2 mb-6">
+            <div className="flex space-x-2 mb-4 sm:mb-6">
               <button
                 onClick={() => setActiveTab('available')}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                   activeTab === 'available'
                     ? 'bg-red-600 text-white neon-glow'
                     : 'bg-gray-800 text-gray-300 hover:text-white'
@@ -131,7 +131,7 @@ const Betting = () => {
               </button>
               <button
                 onClick={() => setActiveTab('my-bets')}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                   activeTab === 'my-bets'
                     ? 'bg-red-600 text-white neon-glow'
                     : 'bg-gray-800 text-gray-300 hover:text-white'
@@ -143,15 +143,15 @@ const Betting = () => {
 
             {/* Available Bets */}
             {activeTab === 'available' && (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {availableBets.map((bet) => (
-                  <div key={bet.id} className="glass-card p-6 hover-lift">
+                  <div key={bet.id} className="glass-card p-4 sm:p-6 hover-lift">
                     <div className="mb-4">
                       <h3 className="text-xl font-bold text-white">{bet.fight}</h3>
                       <p className="text-gray-400">{bet.event} • {bet.type}</p>
                     </div>
 
-                    <div className="grid gap-3">
+                    <div className="grid gap-2.5 sm:gap-3">
                       {bet.options.map((option, index) => (
                         <button
                           key={index}
@@ -163,11 +163,11 @@ const Betting = () => {
                           }`}
                         >
                           <div className="text-left">
-                            <div className="text-white font-semibold">{option.name}</div>
-                            <div className="text-gray-400 text-sm">{option.probability}% de chance</div>
+                            <div className="text-white font-semibold text-sm sm:text-base">{option.name}</div>
+                            <div className="text-gray-400 text-xs sm:text-sm">{option.probability}% de chance</div>
                           </div>
                           <div className="text-right">
-                            <div className="text-2xl font-bold text-red-400">{option.odds}</div>
+                            <div className="text-xl sm:text-2xl font-bold text-red-400">{option.odds}</div>
                           </div>
                         </button>
                       ))}
@@ -181,7 +181,7 @@ const Betting = () => {
             {activeTab === 'my-bets' && (
               <div className="space-y-4">
                 {myBets.map((bet) => (
-                  <div key={bet.id} className="glass-card p-6">
+                  <div key={bet.id} className="glass-card p-4 sm:p-6">
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h3 className="text-lg font-semibold text-white">{bet.fight}</h3>
@@ -196,7 +196,7 @@ const Betting = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="grid grid-cols-3 gap-3 sm:gap-4 text-center">
                       <div>
                         <div className="text-gray-400 text-sm">Apostado</div>
                         <div className="text-white font-semibold">R$ {bet.amount}</div>
@@ -222,7 +222,7 @@ const Betting = () => {
 
           {/* Bet Slip */}
           <div className="lg:col-span-1">
-            <div className="glass-card p-6 sticky top-24">
+            <div className="glass-card p-4 sm:p-6 lg:sticky lg:top-24">
               <h3 className="text-xl font-bold text-white mb-6 flex items-center space-x-2">
                 <Calculator className="w-5 h-5" />
                 <span>Cupom de Aposta</span>
@@ -230,7 +230,7 @@ const Betting = () => {
 
               {selectedBet ? (
                 <div className="space-y-6">
-                  <div className="bg-gray-800/30 rounded-lg p-4">
+                  <div className="bg-gray-800/30 rounded-lg p-3 sm:p-4">
                     <div className="text-sm text-gray-400 mb-1">{selectedBet.event}</div>
                     <div className="text-white font-semibold mb-2">{selectedBet.fight}</div>
                     <div className="flex items-center justify-between">
@@ -248,12 +248,12 @@ const Betting = () => {
                       value={betAmount}
                       onChange={(e) => setBetAmount(e.target.value)}
                       placeholder="R$ 0,00"
-                      className="w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400"
+                      className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-400"
                     />
                   </div>
 
                   {betAmount && (
-                    <div className="bg-gray-800/30 rounded-lg p-4">
+                    <div className="bg-gray-800/30 rounded-lg p-3 sm:p-4">
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-gray-400">Ganho Potencial:</span>
                         <span className="text-green-400 font-bold text-lg">

@@ -104,9 +104,9 @@ const Aposta = () => {
         </div>
 
         {/* Fight Info */}
-        <div className="glass-card p-6 mb-8">
+        <div className="glass-card p-4 sm:p-6 mb-8">
           <h2 className="text-xl font-semibold text-white mb-4">{fight.event}</h2>
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4">
             <div className="text-center">
               <div className="text-lg font-semibold text-white">{fight.fighter1}</div>
               <div className="text-gray-400 text-sm">Red Corner</div>
@@ -122,7 +122,7 @@ const Aposta = () => {
         </div>
 
         {/* Bet Form */}
-        <div className="glass-card p-6">
+        <div className="glass-card p-4 sm:p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Winner Selection */}
             <div className="space-y-2">
@@ -133,7 +133,7 @@ const Aposta = () => {
                 <select
                   value={betData.winner}
                   onChange={(e) => setBetData(prev => ({ ...prev, winner: e.target.value }))}
-                  className="w-full p-3 pl-4 pr-10 bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white appearance-none cursor-pointer hover:border-red-500/50 transition-colors duration-300"
+                  className="w-full p-3 pl-4 pr-10 text-sm sm:text-base bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white appearance-none cursor-pointer hover:border-red-500/50 transition-colors duration-300"
                   required
                 >
                   <option value="" className="bg-gray-800 text-gray-400">Selecione o vencedor</option>
@@ -153,7 +153,7 @@ const Aposta = () => {
                 <select
                   value={betData.method}
                   onChange={(e) => setBetData(prev => ({ ...prev, method: e.target.value }))}
-                  className="w-full p-3 pl-4 pr-10 bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white appearance-none cursor-pointer hover:border-red-500/50 transition-colors duration-300"
+                  className="w-full p-3 pl-4 pr-10 text-sm sm:text-base bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white appearance-none cursor-pointer hover:border-red-500/50 transition-colors duration-300"
                   required
                 >
                   <option value="" className="bg-gray-800 text-gray-400">Selecione o método</option>
@@ -174,7 +174,7 @@ const Aposta = () => {
                 <select
                   value={betData.round}
                   onChange={(e) => setBetData(prev => ({ ...prev, round: e.target.value }))}
-                  className="w-full p-3 pl-4 pr-10 bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white appearance-none cursor-pointer hover:border-red-500/50 transition-colors duration-300"
+                  className="w-full p-3 pl-4 pr-10 text-sm sm:text-base bg-gray-800/50 border border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white appearance-none cursor-pointer hover:border-red-500/50 transition-colors duration-300"
                   required
                 >
                   <option value="" className="bg-gray-800 text-gray-400">Selecione o round</option>
@@ -189,7 +189,7 @@ const Aposta = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium"
+              className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-300 font-medium text-sm sm:text-base"
             >
               Confirmar Aposta
             </button>

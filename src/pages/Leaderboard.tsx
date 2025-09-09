@@ -92,33 +92,34 @@ const Leaderboard = () => {
     <div className="min-h-screen pt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-gradient mb-4 flex items-center justify-center space-x-4">
-            <Trophy className="w-8 h-8 md:w-12 md:h-12 text-red-500" />
+        <div className="text-center mb-8 md:mb-12">
+          <h1 className="text-3xl md:text-6xl font-bold text-gradient mb-3 md:mb-4 flex items-center justify-center space-x-3 md:space-x-4">
+            <Trophy className="w-7 h-7 md:w-12 md:h-12 text-red-500" />
             <span>Classificação Completa</span>
           </h1>
-          <p className="text-gray-400 text-lg">Os melhores apostadores da plataforma</p>
+          <p className="text-gray-400 text-base md:text-lg">Os melhores apostadores da plataforma</p>
         </div>
 
         {/* Leaderboard Table */}
-        <div className="glass-card p-6">
+        <div className="glass-card p-4 sm:p-6">
+          <div className="w-full overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="border-b border-gray-700">
-                <TableHead className="text-gray-400 font-semibold">Posição</TableHead>
-                <TableHead className="text-gray-400 font-semibold">Usuário</TableHead>
-                <TableHead className="text-gray-400 font-semibold text-center">Pontos</TableHead>
+                <TableHead className="text-gray-400 font-semibold whitespace-nowrap">Posição</TableHead>
+                <TableHead className="text-gray-400 font-semibold whitespace-nowrap">Usuário</TableHead>
+                <TableHead className="text-gray-400 font-semibold text-center whitespace-nowrap">Pontos</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {leaderboardData.map((user, index) => (
                 <TableRow key={user.id_cliente} className="border-b border-gray-800 hover:bg-gray-800/30 transition-colors">
-                  <TableCell className="py-4">
+                  <TableCell className="py-3 sm:py-4">
                     <div className="flex items-center space-x-2">
                       {getPositionIcon(index + 1)}
                     </div>
                   </TableCell>
-                  <TableCell className="py-4">
+                  <TableCell className="py-3 sm:py-4">
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center">
                         <span className="text-white font-bold text-sm">
@@ -128,8 +129,8 @@ const Leaderboard = () => {
                       <span className="text-white font-medium">{user.nome_cliente}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="text-center py-4">
-                    <span className="text-green-400 font-semibold text-lg">
+                  <TableCell className="text-center py-3 sm:py-4">
+                    <span className="text-green-400 font-semibold text-base sm:text-lg">
                       {formatPoints(user.pontos_cliente)}
                     </span>
                   </TableCell>
@@ -137,6 +138,7 @@ const Leaderboard = () => {
               ))}
             </TableBody>
           </Table>
+          </div>
         </div>
       </div>
     </div>
