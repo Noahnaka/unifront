@@ -126,7 +126,7 @@ const AdminDashboard = () => {
     // Fetch stats from payload
     const fetchStats = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/ufc/payload');
+        const response = await fetch('https://ufc-opal.vercel.app/api/ufc/payload');
         const data = await response.json();
         if (data.status && data.data) {
           setStats(prev => ({
@@ -149,7 +149,7 @@ const AdminDashboard = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/ufc/eventos');
+      const response = await fetch('https://ufc-opal.vercel.app/api/ufc/eventos');
       const data = await response.json();
       
       if (response.ok && data.status) {
@@ -172,7 +172,7 @@ const AdminDashboard = () => {
   const fetchFightsForEvent = async (eventId: number) => {
     try {
       setIsLoadingFights(prev => ({ ...prev, [eventId]: true }));
-      const response = await fetch(`http://localhost:3000/api/ufc/fights/${eventId}`);
+      const response = await fetch(`https://ufc-opal.vercel.app/api/ufc/fights/${eventId}`);
       const data = await response.json();
       
       if (response.ok && data.status) {
@@ -216,7 +216,7 @@ const AdminDashboard = () => {
 
     try {
       const adminToken = localStorage.getItem('adminToken');
-      const response = await fetch('http://localhost:3000/api/ufc/create/event', {
+      const response = await fetch('https://ufc-opal.vercel.app/api/ufc/create/event', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -291,7 +291,7 @@ const AdminDashboard = () => {
 
     try {
       const adminToken = localStorage.getItem('adminToken');
-      const response = await fetch('http://localhost:3000/api/ufc/create/fight', {
+      const response = await fetch('https://ufc-opal.vercel.app/api/ufc/create/fight', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -386,7 +386,7 @@ const AdminDashboard = () => {
 
     try {
       const adminToken = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:3000/api/ufc/update/fight/${selectedFight.id_luta}`, {
+      const response = await fetch(`https://ufc-opal.vercel.app/api/ufc/update/fight/${selectedFight.id_luta}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -427,7 +427,7 @@ const AdminDashboard = () => {
 
     try {
       const adminToken = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:3000/api/ufc/delete/fight/${fight.id_luta}`, {
+      const response = await fetch(`https://ufc-opal.vercel.app/api/ufc/delete/fight/${fight.id_luta}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${adminToken}`
@@ -456,7 +456,7 @@ const AdminDashboard = () => {
     const newStatus = event.status_evento === 1 ? 0 : 1;
     try {
       const adminToken = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:3000/api/ufc/event/status/${event.id_evento}`, {
+      const response = await fetch(`https://ufc-opal.vercel.app/api/ufc/event/status/${event.id_evento}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -485,7 +485,7 @@ const AdminDashboard = () => {
     setIsDeletingEvent(prev => ({ ...prev, [event.id_evento]: true }));
     try {
       const adminToken = localStorage.getItem('adminToken');
-      const response = await fetch(`http://localhost:3000/api/ufc/delete/evento/${event.id_evento}`, {
+      const response = await fetch(`https://ufc-opal.vercel.app/api/ufc/delete/evento/${event.id_evento}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${adminToken}`
@@ -725,7 +725,7 @@ const AdminDashboard = () => {
                               setIsEndingEvent(prev => ({ ...prev, [event.id_evento]: true }));
                               try {
                                 const adminToken = localStorage.getItem('adminToken');
-                                const response = await fetch('http://localhost:3000/api/pontos', {
+                                const response = await fetch('https://ufc-opal.vercel.app/api/pontos', {
                                   method: 'POST',
                                   headers: {
                                     'Content-Type': 'application/json',
@@ -1403,7 +1403,7 @@ const AdminDashboard = () => {
                   try {
                     const adminToken = localStorage.getItem('adminToken');
                     const responses = await Promise.all(results.map(async (fightResult) => {
-                      const response = await fetch('http://localhost:3000/api/ufc/vencedor', {
+                      const response = await fetch('https://ufc-opal.vercel.app/api/ufc/vencedor', {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',

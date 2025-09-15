@@ -23,7 +23,7 @@ const Leaderboard = () => {
         setIsLoading(true);
         setError(null);
         
-        const response = await fetch('http://localhost:3000/api/cliente');
+        const response = await fetch('https://ufc-opal.vercel.app/api/cliente');
         const result = await response.json();
         
         if (response.ok && result.status && result.data) {

@@ -53,7 +53,7 @@ const Navbar = () => {
       try {
 
         const token = localStorage.getItem('token');
-        const id = await fetch('http://localhost:3000/api/token/conta/cliente', {
+        const id = await fetch('https://ufc-opal.vercel.app/api/token/conta/cliente', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ const Navbar = () => {
         const idData = await id.json();
         const idCliente = idData.payload.id_cliente;
 
-        const response = await fetch(`http://localhost:3000/api/cliente/pontos/${idCliente}`, {
+        const response = await fetch(`https://ufc-opal.vercel.app/api/cliente/pontos/${idCliente}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

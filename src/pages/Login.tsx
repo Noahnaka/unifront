@@ -17,7 +17,7 @@ const Login = () => {
     const email_cliente = email;
     const senha_cliente = password;
     try {
-      const response = await fetch('http://localhost:3000/api/cliente/login', {
+      const response = await fetch('https://ufc-opal.vercel.app/api/cliente/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

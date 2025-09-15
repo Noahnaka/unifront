@@ -20,7 +20,7 @@ const Fights = () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) return;
-        const payload = await fetch('http://localhost:3000/api/token/conta/cliente', {
+        const payload = await fetch('https://ufc-opal.vercel.app/api/token/conta/cliente', {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -29,7 +29,7 @@ const Fights = () => {
         });
         const data = await payload.json();
         const id_cliente = data.payload.id_cliente;
-        const betsResponse = await fetch(`http://localhost:3000/api/ufc/user/bets?id_cliente=${id_cliente}`);
+        const betsResponse = await fetch(`https://ufc-opal.vercel.app/api/ufc/user/bets?id_cliente=${id_cliente}`);
         const betsData = await betsResponse.json();
         setUserBets(betsData.data || []);
         console.log('User bets:', betsData);
@@ -43,7 +43,7 @@ const Fights = () => {
   const { data: eventsData, isLoading: isLoadingEvents } = useQuery<any>({
     queryKey: ['events'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:3000/api/ufc/eventos');
+      const response = await fetch('https://ufc-opal.vercel.app/api/ufc/eventos');
       const data = await response.json();
       return data;
     }
@@ -55,7 +55,7 @@ const Fights = () => {
     queries: activeEvents.map((event: any) => ({
       queryKey: ['fights', event.id_evento],
       queryFn: async () => {
-        const response = await fetch(`http://localhost:3000/api/ufc/fights/${event.id_evento}`);
+        const response = await fetch(`https://ufc-opal.vercel.app/api/ufc/fights/${event.id_evento}`);
         const data = await response.json();
         return data;
       },
@@ -105,7 +105,7 @@ const Fights = () => {
         const fightId = fight.id_luta;
         if (!fetchedOddsRef.current.has(fightId)) {
           fetchedOddsRef.current.add(fightId);
-          fetch(`http://localhost:3000/api/ufc/lutas/odds/${fightId}`)
+          fetch(`https://ufc-opal.vercel.app/api/ufc/lutas/odds/${fightId}`)
             .then(res => res.json())
             .then(data => {
               const items = Array.isArray(data) ? data : (Array.isArray(data?.data) ? data.data : []);

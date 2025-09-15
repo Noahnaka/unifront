@@ -50,7 +50,7 @@ const Aposta = () => {
         return;
       }
 
-      const payload = await fetch('http://localhost:3000/api/token/conta/cliente', {
+      const payload = await fetch('https://ufc-opal.vercel.app/api/token/conta/cliente', {
         method: 'GET',
         headers:  {
            'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ const Aposta = () => {
         rodada: betData.round
       };
       console.log('Bet body:', body);
-      const response = await fetch('http://localhost:3000/api/ufc/', {
+      const response = await fetch('https://ufc-opal.vercel.app/api/ufc/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -9,7 +9,7 @@ const Home = () => {
   const { data: eventsData, isLoading: isLoadingEvents } = useQuery<any>({
     queryKey: ['events'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:3000/api/ufc/eventos');
+      const response = await fetch('https://ufc-opal.vercel.app/api/ufc/eventos');
       const data = await response.json();
       console.log('Events data:', data);
       return data;
@@ -19,7 +19,7 @@ const Home = () => {
   const { data: statsData, isLoading: isLoadingStats } = useQuery({
     queryKey: ['stats'],
     queryFn: async () => {
-      const response = await fetch('http://localhost:3000/api/ufc/payload');
+      const response = await fetch('https://ufc-opal.vercel.app/api/ufc/payload');
       const data = await response.json();
       return data;
     }
@@ -44,7 +44,7 @@ const Home = () => {
     queries: eventList.map((event: any) => ({
       queryKey: ['fights', event.id_evento],
       queryFn: async () => {
-        const response = await fetch(`http://localhost:3000/api/ufc/fights/${event.id_evento}`);
+        const response = await fetch(`https://ufc-opal.vercel.app/api/ufc/fights/${event.id_evento}`);
         const data = await response.json();
         return data;
       },

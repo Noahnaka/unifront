@@ -54,7 +54,7 @@ const Admin = () => {
 
     try {
       // Simulate admin login - replace with actual admin API endpoint
-      const response = await fetch('http://localhost:3000/api/admin/login', {
+      const response = await fetch('https://ufc-opal.vercel.app/api/admin/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

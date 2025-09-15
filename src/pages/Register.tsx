@@ -29,7 +29,7 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3000/api/cliente/cadastro', {
+      const response = await fetch('https://ufc-opal.vercel.app/api/cliente/cadastro', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
