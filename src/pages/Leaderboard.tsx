@@ -25,10 +25,13 @@ const Leaderboard = () => {
         
         const response = await fetch('https://ufc-opal.vercel.app/api/cliente');
         const result = await response.json();
-        
+
         if (response.ok && result.status && result.data) {
-          // Sort by pontos_cliente in descending order
-          const sortedData = result.data.sort((a: Cliente, b: Cliente) => b.pontos_cliente - a.pontos_cliente);
+          const normalized: Cliente[] = (result.data as any[]).map((u: any) => ({
+            ...u,
+            pontos_cliente: Number(u?.pontos_cliente ?? 0)
+          }));
+          const sortedData = normalized.sort((a: Cliente, b: Cliente) => (b.pontos_cliente ?? 0) - (a.pontos_cliente ?? 0));
           setLeaderboardData(sortedData);
         } else {
           setError('Erro ao carregar classificação');
@@ -53,8 +56,9 @@ const Leaderboard = () => {
     }
   };
 
-  const formatPoints = (points: number) => {
-    return points.toLocaleString();
+  const formatPoints = (points?: number) => {
+    const safe = typeof points === 'number' ? points : 0;
+    return safe.toLocaleString();
   };
 
   if (isLoading) {
@@ -123,7 +127,7 @@ const Leaderboard = () => {
                     <div className="flex items-center space-x-3">
                       <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center">
                         <span className="text-white font-bold text-sm">
-                          {user.nome_cliente.charAt(0).toUpperCase()}
+                          {(user.nome_cliente || '?').charAt(0).toUpperCase()}
                         </span>
                       </div>
                       <span className="text-white font-medium">{user.nome_cliente}</span>
