@@ -29,12 +29,12 @@ const Aposta = () => {
   });
 
   const methods = [
-    'Knockout',
-    'Submission',
-    'Unanimous Decision',
-    'Split Decision',
-    'Draw',
-    'No Contest',
+    { value: 'Knockout', label: 'Nocaute' },
+    { value: 'Submission', label: 'Finalização' },
+    { value: 'Unanimous Decision', label: 'Decisão Unânime' },
+    { value: 'Split Decision', label: 'Decisão Dividida' },
+    { value: 'Draw', label: 'Empate' },
+    { value: 'No Contest', label: 'Sem Resultado' },
   ];
 
   const rounds = Array.from({ length: fight.rounds }, (_, i) => (i + 1).toString());
@@ -158,7 +158,7 @@ const Aposta = () => {
                 >
                   <option value="" className="bg-gray-800 text-gray-400">Selecione o método</option>
                   {methods.map((method) => (
-                    <option key={method} value={method} className="bg-gray-800 text-white">{method}</option>
+                    <option key={method.value} value={method.value} className="bg-gray-800 text-white">{method.label}</option>
                   ))}
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
