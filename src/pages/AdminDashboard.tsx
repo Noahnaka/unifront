@@ -107,11 +107,12 @@ const AdminDashboard = () => {
   ];
 
   const finishMethods = [
-    'KO',
+    'Knockout',
     'Submission',
-    'Decision',
-    'DQ',
+    'Unanimous Decision',
+    'Split Decision',
     'No Contest',
+    'Draw'
   ];
 
   // Check authentication on component mount
